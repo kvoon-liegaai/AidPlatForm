@@ -3,8 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    redirect: '/home',
   },
   {
     path: '/login',
@@ -14,16 +13,75 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/service-list',
-    component: () => import('layouts/AppCommonLayout.vue'),
+    path: '/home',
+    component: () => import('src/layouts/FirstLevelLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/ServiceList/ServiceList.vue'),
+        component: () => import('pages/HomePage/HomePage.vue'),
       },
     ],
   },
-
+  {
+    path: '/appointment',
+    component: () => import('src/layouts/FirstLevelLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/AppointmentPage/AppointmentPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/inbox',
+    component: () => import('src/layouts/FirstLevelLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/InboxPage/InboxPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/chat',
+    component: () => import('src/layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/ChatPage/ChatPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/profile',
+    component: () => import('src/layouts/FirstLevelLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/ProfilePage/ProfilePage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/setting',
+    component: () => import('src/layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: 'quick-match',
+        component: () => import('pages/SettingPage/QuickMatch.vue'),
+      },
+    ],
+  },
+  {
+    path: '/map',
+    component: () => import('src/layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: 'geo-pick',
+        component: () => import('pages/MapPage/GeoPick.vue'),
+      },
+    ],
+  },
   // Always leave this as last one,
   // but you can also remove it
   {

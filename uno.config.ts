@@ -1,6 +1,10 @@
 import { defineConfig, presetUno, presetAttributify } from 'unocss';
+import transformerVariantGroup from '@unocss/transformer-variant-group';
 
 export default defineConfig({
+  shortcuts: {
+    card: 'ring-(coolGray-200 2 solid offset-2) shadow-md',
+  },
   presets: [presetAttributify({}), presetUno()],
   theme: {
     colors: {
@@ -307,40 +311,41 @@ export default defineConfig({
     },
   },
   rules: [
-    ['no-shadow', { 'box-shadow': 'none' }],
-    ['q-ma-auto', { margin: 'auto' }],
-    ['q-pa-auto', { padding: 'auto' }],
-    [
-      /^q-m[xy]-(\d+)$/,
-      ([, d]) => ({
-        'margin-left': `${d / 4}rem`,
-        'margin-right': `${d / 4}rem`,
-      }),
-    ],
-    [/^q-ma-(\d+)$/, ([, d]) => ({ margin: `${d / 4}rem` })],
-    [
-      /^q-p[xy]-(\d+)$/,
-      ([, d]) => ({
-        'padding-left': `${d / 4}rem`,
-        'padding-right': `${d / 4}rem`,
-      }),
-    ],
-    [/^q-pa-(\d+)$/, ([, d]) => ({ padding: `${d / 4}rem` })],
-    [
-      /^q-p[xy]-(.*)$/,
-      ([, c], { theme }) => {
-        if (theme.size[c])
-          return {
-            'padding-left': theme.size[c],
-            'padding-right': theme.size[c],
-          };
-      },
-    ],
-    [
-      /^q-pa-(.*)$/,
-      ([, c], { theme }) => {
-        if (theme.size[c]) return { padding: theme.size[c] };
-      },
-    ],
+    // ['no-shadow', { 'box-shadow': 'none' }],
+    // ['q-ma-auto', { margin: 'auto' }],
+    // ['q-pa-auto', { padding: 'auto' }],
+    // [
+    //   /^q-m[xy]-(\d+)$/,
+    //   ([, d]) => ({
+    //     'margin-left': `${d / 4}rem`,
+    //     'margin-right': `${d / 4}rem`,
+    //   }),
+    // ],
+    // [/^q-ma-(\d+)$/, ([, d]) => ({ margin: `${d / 4}rem` })],
+    // [
+    //   /^q-p[xy]-(\d+)$/,
+    //   ([, d]) => ({
+    //     'padding-left': `${d / 4}rem`,
+    //     'padding-right': `${d / 4}rem`,
+    //   }),
+    // ],
+    // [/^q-pa-(\d+)$/, ([, d]) => ({ padding: `${d / 4}rem` })],
+    // [
+    //   /^q-p[xy]-(.*)$/,
+    //   ([, c], { theme }) => {
+    //     if (theme.size[c])
+    //       return {
+    //         'padding-left': theme.size[c],
+    //         'padding-right': theme.size[c],
+    //       };
+    //   },
+    // ],
+    // [
+    //   /^q-pa-(.*)$/,
+    //   ([, c], { theme }) => {
+    //     if (theme.size[c]) return { padding: theme.size[c] };
+    //   },
+    // ],
   ],
+  transformers: [transformerVariantGroup()],
 });
