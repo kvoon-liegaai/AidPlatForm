@@ -70,6 +70,7 @@ module.exports = {
   rules: {
     'prefer-promise-reject-errors': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
 
     quotes: ['warn', 'single', { avoidEscape: true }],
 

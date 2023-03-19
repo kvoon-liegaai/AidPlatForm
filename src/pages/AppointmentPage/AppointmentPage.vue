@@ -1,5 +1,5 @@
 <template>
-  <div class="q-gutter-y-md" style="max-width: 400px">
+  <div class="q-gutter-y-md">
     <q-tabs v-model="tab" narrow-indicator dense align="justify" class="text-primary bg-coolGray-1">
       <q-tab :ripple="false" name="all" label="全部" />
       <q-tab :ripple="false" name="processing" label="进行中" />
@@ -43,7 +43,6 @@
           </q-btn>
         </q-card-actions>
       </q-card>
-
     </section>
   </div>
 </template>

@@ -8,22 +8,19 @@
 
       <q-page-container>
         <q-page relative>
-          <div id="container" absolute top-0 bottom-0 left-0 right-0></div>
-          <pin-marker-vue id="pin" location="123" theme-color="primary" :status="LoadStatus.PENDING"
+          <div id="map-container"></div>
+          <pin-marker-vue id="pin" :location="cardInfo.building" theme-color="primary" :status="pinStatus"
             :on-click="run"></pin-marker-vue>
-          <!-- <div class="geo-info-card" fixed bottom-0 bg-white w-screen>
-            <div class="geo-info-card__address">位置</div>
-            <div class="geo-info-card__fullAddress">位置位置位置位置位置</div>
-            <q-btn color="primary">确认</q-btn>
-          </div> -->
-          <q-card class="my-card" fixed bottom-10 left-0 right-0 w-90 mx-auto>
+          <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
             <q-card-section class="bg-grey-8 text-white">
-              <div class="text-h6">Our Changing Planet</div>
-              <div class="text-subtitle2">by John Doe</div>
+              <div class="text-h6">{{ cardInfo.building }}
+                <!-- <span text-sm>附近</span> -->
+              </div>
+              <div class="text-subtitle2" truncate>{{ cardInfo.formattedAddress }}</div>
             </q-card-section>
 
             <q-card-actions vertical align="center">
-              <q-btn flat w-full font-bold>确认</q-btn>
+              <q-btn flat w-full font-bold :disable="pinStatus != LoadStatus.PREPARED">确认</q-btn>
             </q-card-actions>
           </q-card>
         </q-page>
@@ -33,59 +30,118 @@
 </template>
 
 <script setup lang='ts'>
-
-
 import BackBar from 'src/components/BackBar.vue';
 import { Notify } from 'quasar';
-// import { useGeolocation } from '@vueuse/core'
 import { useDefaultCoords } from 'src/composition/geo';
 import { useGeoStore } from 'src/stores/geo';
 import PinMarkerVue from 'src/components/PinMarker.vue';
 import { LoadStatus } from 'src/types/status';
+import { getReGeo } from './utils';
+import { catchError, debounce, debounceTime, from, map, mergeMap, Observable, of, switchMap, tap } from 'rxjs'
+import { fromEvent, useSubscription } from '@vueuse/rxjs'
 
 const geoStore = useGeoStore();
 
+// let mapObj: mapboxgl.Map;
+// let pinMarker: mapboxgl.Marker;
 let mapObj: AMap.Map;
 let pinMarker: AMap.Marker;
+let pinStatus = ref(LoadStatus.LOADING);
 let selfMarker: AMap.Marker;
+
+const cardInfo = reactive({
+  building: '',
+  formattedAddress: ''
+})
 
 function run() {
   console.log('213')
 }
 
 onMounted(() => {
-  if (!AMap) {
-    Notify.create('地图加载失败')
-    return
-  }
+  let center: [number, number];
 
   nextTick(() => {
-    let center: [number, number];
+    if (!AMap) {
+      Notify.create('地图加载失败')
+      return
+    }
 
-    if (geoStore.error) {
-      center = useDefaultCoords('array');
-      Notify.create({ message: '未开启地图权限，已为您设置到 app 默认地址' })
+    // set center
+    if (!geoStore.error && geoStore.coords.latitude != Infinity && geoStore.coords.longitude != Infinity) {
+      center = [geoStore.coords.longitude, geoStore.coords.latitude];
     }
     else {
-      center = [geoStore.coords.longitude, geoStore.coords.latitude]
+      center = useDefaultCoords('array');
+      Notify.create({ message: geoStore.error?.code + ':未获取到您的位置，已为您设置到 app 默认地址' })
+      console.log('geoStore.error', geoStore.error)
     }
+    console.log('center', center)
 
-    mapObj = new AMap.Map('container', {
+    // init map
+    mapObj = new AMap.Map('map-container', {
       center,
-      zoom: 11
+      zoom: 16,
     })
 
+    const RegeoCenter2UpdateCardInfo = (): Observable<any> =>
+      getReGeo(mapObj.getCenter())
+        .pipe(
+          tap((regeocode) => {
+            console.log('regeocode', regeocode)
+            if (regeocode.aois && regeocode.aois.length != 0) {
+              cardInfo.building = regeocode.aois[0].name;
+              cardInfo.formattedAddress = regeocode.formattedAddress;
+              pinStatus.value = LoadStatus.PREPARED;
+            }
+            else {
+              cardInfo.building = '当前位置';
+              cardInfo.formattedAddress = '';
+              pinStatus.value = LoadStatus.LOADING;
+            }
+          })
+        )
 
+    // map event
+    // @ts-ignore
+    const mapComplete$ = fromEvent(mapObj, 'complete')
+    useSubscription(
+      mapComplete$
+        .pipe(switchMap(RegeoCenter2UpdateCardInfo))
+        .subscribe()
+    )
+    // @ts-ignore
+    const mapMove$ = fromEvent(mapObj, 'mapmove').pipe(tap(() => pinStatus.value = LoadStatus.LOADING))
+    // @ts-ignore
+    const mapMoveEndDebounced$ = fromEvent(mapObj, 'moveend')
+
+    // pin marker
     const pinDom = document.getElementById('pin')
     if (pinDom) {
-      pinMarker = new AMap.Marker({
-        content: pinDom,
-        position: mapObj.getCenter(),
-        anchor: 'bottom-center'
-      })
-      pinMarker.addTo(mapObj);
+      // pinMarker = new AMap.Marker({
+      //   content: pinDom,
+      //   position: mapObj.getCenter(),
+      //   anchor: 'bottom-center'
+      // })
+      // pinMarker.addTo(mapObj);
+
+      useSubscription(
+        mapMoveEndDebounced$
+          .pipe(
+            debounceTime(1000),
+            tap(() => console.log('获取中心点位置')),
+            switchMap(RegeoCenter2UpdateCardInfo),
+          )
+          .subscribe(() => {
+            console.log('123')
+          })
+      )
+      useSubscription(
+        mapMove$.subscribe()
+      )
     }
 
+    // self marker
     if (!geoStore.error) {
       selfMarker = new AMap.Marker({
         // content: ,
@@ -96,15 +152,26 @@ onMounted(() => {
         selfMarker.setPosition([geoStore.coords.longitude, geoStore.coords.latitude])
       })
     }
-
-    mapObj.on('mapmove', () => {
-      const lnglat = mapObj.getCenter();
-      pinMarker.setPosition([lnglat.getLng(), lnglat.getLat()]);
-    })
   })
 })
 
-
+onUnmounted(() => {
+  mapObj.destroy();
+})
 </script>
 
-<style lang='scss' scoped></style>
+<style lang='scss' scoped>
+#map-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+#pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -100%);
+}
+</style>
