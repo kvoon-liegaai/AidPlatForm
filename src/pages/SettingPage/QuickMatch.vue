@@ -13,6 +13,7 @@
               <q-select standout="bg-primary text-white" v-model="form.subareaName" :options="options" label="服务分区"
                 item-aligned />
 
+
               <q-input filled v-model="form.date.from" item-aligned unmasked-value mask="####-##-## ##:##">
                 <template v-slot:prepend>
                   <q-icon name="event" class="cursor-pointer">
@@ -65,13 +66,31 @@
                 </template>
               </q-input>
 
-
-              <q-input filled v-model="form.geo.address" item-aligned readonly @click="selectMap">
+              <q-input filled v-model="form.geo.address" item-aligned readonly placeholder="设置地理位置" @click="selectMap">
                 <template v-slot:append>
-                  <q-icon name="place" class="cursor-pointer"></q-icon>
+                  <q-icon name="place" class="cursor-pointer">
+                  </q-icon>
                 </template>
               </q-input>
 
+              <q-dialog v-model="showMapPicker">
+                <q-layout view="Lhh lpR fff" container class="bg-white">
+
+                  <q-header class="bg-primary">
+                    <q-toolbar>
+                      <q-toolbar-title>地址选择</q-toolbar-title>
+                      <q-btn flat v-close-popup round dense icon="close" />
+                    </q-toolbar>
+                  </q-header>
+
+                  <q-page-container>
+                    <q-page>
+                      <geo-picker :source="form.geo.lnglat" @confirm="onConfirmGeo"></geo-picker>
+                    </q-page>
+                  </q-page-container>
+
+                </q-layout>
+              </q-dialog>
 
               <!-- <q-btn label="Submit" type="submit" color="primary" />
               <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" /> -->
@@ -84,29 +103,30 @@
 </template>
 
 <script setup lang='ts'>
+import { useLocalStorage } from '@vueuse/core';
 import BackBar from 'src/components/BackBar.vue';
+import GeoPicker from 'src/components/GeoPicker.vue';
+import { defaultQuickMatchSheet, IGeo, IQuickMatchSheet } from 'src/types';
 import { subAreasName } from '../HomePage/model';
-const router = useRouter();
+
+const showMapPicker = ref(false);
 
 const options = subAreasName;
 
-const form = ref({
-  subareaName: '',
-  date: {
-    from: '2019-02-22 21:02',
-    to: '2019-02-22 21:02',
-  },
-  geo: {
-    address: '虚拟大学'
-  }
-})
+const form = useLocalStorage<IQuickMatchSheet>('quickMatchForm', defaultQuickMatchSheet)
 
 function setQuickMatch() {
   console.log('sq');
 }
 
 function selectMap() {
-  router.push('/map/geo-pick');
+  showMapPicker.value = true;
+}
+
+function onConfirmGeo(geo: IGeo) {
+  console.log('geo', geo)
+  form.value.geo = geo;
+  showMapPicker.value = false;
 }
 </script>
 

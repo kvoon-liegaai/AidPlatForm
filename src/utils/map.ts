@@ -33,13 +33,14 @@
 //   console.log('data.message', data.message)
 // }
 
-import { Observable } from 'rxjs';
+import { Observable, switchMap, of } from 'rxjs';
+import { IGeo } from 'src/types';
 
 export function getReGeo(lnglat: AMap.LngLat): Observable<any> {
   return new Observable((observer) => {
     window.Geocoder.getAddress(lnglat, function (status: any, result: any) {
       console.log('status', status);
-      console.log('result', result);
+      console.log('Geocoder.getAddress result: ', result);
       if (status === 'complete' && result.info === 'OK') {
         observer.next(result.regeocode);
         observer.complete();
@@ -49,3 +50,28 @@ export function getReGeo(lnglat: AMap.LngLat): Observable<any> {
     });
   });
 }
+
+export const regeo2IGeo = (lnglat: AMap.LngLat): Observable<IGeo> =>
+  getReGeo(lnglat).pipe(
+    switchMap((regeocode) => {
+      const res: IGeo = {
+        address: '',
+        fullAddress: '',
+        lnglat: {
+          longitude: lnglat.getLng(),
+          latitude: lnglat.getLat(),
+        },
+        regeocode,
+      };
+      if (regeocode.aois && regeocode.aois.length != 0) {
+        res.address = regeocode.aois[0].name;
+        res.fullAddress = regeocode.formattedAddress;
+      } else {
+        // console.log('err');
+        // throw new Error('无法解析该位置信息');
+        res.address = '当前位置';
+        res.fullAddress = '';
+      }
+      return of(res);
+    })
+  );

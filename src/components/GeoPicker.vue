@@ -1,71 +1,65 @@
 <template>
   <section class="quick-match">
-    <q-layout view="lHh lpr lFf" container h-screen>
-      <q-header>
-        <back-bar title="位置选择"></back-bar>
-        <!-- {{ geoStore.coords.longitude + " " + geoStore.coords.latitude }} -->
-      </q-header>
+    <div id="map-container"></div>
+    <pin-marker-vue id="pin" :location="cardInfo.address" theme-color="primary" :status="pinStatus"></pin-marker-vue>
+    <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
+      <q-card-section class="bg-grey-8 text-white">
+        <div class="text-h6">{{ cardInfo.address }}
+          <!-- <span text-sm>附近</span> -->
+        </div>
+        <div class="text-subtitle2" truncate>{{ cardInfo.fullAddress }}</div>
+      </q-card-section>
 
-      <q-page-container>
-        <q-page relative>
-          <div id="map-container"></div>
-          <pin-marker-vue id="pin" :location="cardInfo.address" theme-color="primary"
-            :status="pinStatus"></pin-marker-vue>
-          <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
-            <q-card-section class="bg-grey-8 text-white">
-              <div class="text-h6">{{ cardInfo.address }}
-                <!-- <span text-sm>附近</span> -->
-              </div>
-              <div class="text-subtitle2" truncate>{{ cardInfo.fullAddress }}</div>
-            </q-card-section>
-
-            <q-card-actions vertical align="center" @click="onConfirm">
-              <q-btn flat w-full font-bold :disable="pinStatus != LoadStatus.PREPARED">确认</q-btn>
-            </q-card-actions>
-          </q-card>
-        </q-page>
-      </q-page-container>
-    </q-layout>
+      <!-- <q-card-actions vertical align="center" @click="onConfirm"> -->
+      <q-card-actions vertical align="center" @click="onConfirm">
+        <q-btn flat w-full font-bold :disable="pinStatus != LoadStatus.PREPARED">确认</q-btn>
+      </q-card-actions>
+    </q-card>
   </section>
 </template>
 
 <script setup lang='ts'>
-import BackBar from 'src/components/BackBar.vue';
-import { Notify, useQuasar } from 'quasar';
+import { Notify } from 'quasar';
 import { useDefaultCoords } from 'src/composition/geo';
 import { useGeoStore } from 'src/stores/geo';
 import PinMarkerVue from 'src/components/PinMarker.vue';
 import { LoadStatus } from 'src/types/status';
-import { catchError, debounceTime, EMPTY, merge, Observable, of, switchMap, tap } from 'rxjs'
+import { debounceTime, merge, switchMap, tap } from 'rxjs'
 import { fromEvent, toObserver, useSubscription } from '@vueuse/rxjs'
-import { useLocalStorage } from '@vueuse/core';
-import { defaultQuickMatchSheet, IGeo, IQuickMatchSheet } from 'src/types';
+import { IGeo } from 'src/types';
 import { regeo2IGeo } from 'src/utils/map';
 
-const geoStore = useGeoStore();
-const quickMatchForm = useLocalStorage<IQuickMatchSheet>('quickMatchForm', defaultQuickMatchSheet)
+const props = defineProps<{
+  source?: {
+    longitude: number;
+    latitude: number;
+  }
+}>()
+
+const emits = defineEmits<{
+  (event: 'confirm', geo: IGeo): void
+}>()
+
+const geoStore = useGeoStore(); // self geo location
 
 let mapObj: AMap.Map;
 // let pinMarker: AMap.Marker;
 let pinStatus = ref(LoadStatus.LOADING);
 let selfMarker: AMap.Marker;
 
-const cardInfo =
-  // useLocalStorage('quickMatchForm')
-  ref<IGeo>({
-    address: '',
-    fullAddress: '',
-    lnglat: useDefaultCoords('object'),
-    regeocode: {}
-  })
+const cardInfo = ref<IGeo>({
+  address: '',
+  fullAddress: '',
+  lnglat: useDefaultCoords('object'),
+  regeocode: {}
+})
 
 function onConfirm() {
   if (pinStatus.value === LoadStatus.LOADING) {
     Notify.create({ message: '请先选好位置', position: 'top' })
     return;
   }
-
-  quickMatchForm.value.geo = cardInfo.value;
+  emits('confirm', cardInfo.value)
 }
 
 onMounted(() => {
@@ -78,13 +72,21 @@ onMounted(() => {
     }
 
     // center
-    if (!geoStore.error && geoStore.coords.latitude != Infinity && geoStore.coords.longitude != Infinity) {
-      center = [geoStore.coords.longitude, geoStore.coords.latitude];
+    if (props.source) {
+      // center from source exist
+      center = [props.source.longitude, props.source.latitude];
     }
     else {
-      center = useDefaultCoords('array');
-      Notify.create({ message: geoStore.error?.code + ':未获取到您的位置，已为您设置到 app 默认地址' })
-      console.log('geoStore.error', geoStore.error)
+      if (!geoStore.error && geoStore.coords.latitude != Infinity && geoStore.coords.longitude != Infinity) {
+        // center from self geolocation
+        center = [geoStore.coords.longitude, geoStore.coords.latitude];
+      }
+      else {
+        // center from default geolocation
+        center = useDefaultCoords('array');
+        Notify.create({ message: geoStore.error?.code + ':未获取到您的位置，已为您设置到 app 默认地址' })
+        console.log('geoStore.error', geoStore.error)
+      }
     }
     console.log('center', center)
 

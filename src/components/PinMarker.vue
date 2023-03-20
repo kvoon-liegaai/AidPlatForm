@@ -24,8 +24,9 @@ const props = defineProps<{
   location: string;
   themeColor: keyof typeof theme2StyleClass;
   status: LoadStatus;
-  onClick: () => unknown;
+  onClick?: () => unknown;
 }>()
+
 
 const theme2StyleClass = {
   primary: 'pin-marker_theme-primary',
