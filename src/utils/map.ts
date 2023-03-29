@@ -33,22 +33,23 @@
 //   console.log('data.message', data.message)
 // }
 
-import { Observable, switchMap, of, BehaviorSubject, Subject, combineLatest, combineLatestAll, debounce, debounceTime  } from 'rxjs';
-import { IGeo } from 'src/types';
+import { BehaviorSubject, Observable, Subject, combineLatest, debounceTime, of, switchMap } from 'rxjs'
+import type { IGeo } from 'src/types'
 
 export function getReGeo(lnglat: AMap.LngLat): Observable<any> {
   return new Observable((observer) => {
-    window.Geocoder.getAddress(lnglat, function (status: any, result: any) {
-      console.log('status', status);
-      console.log('Geocoder.getAddress result: ', result);
+    window.Geocoder.getAddress(lnglat, (status: any, result: any) => {
+      console.log('status', status)
+      console.log('Geocoder.getAddress result: ', result)
       if (status === 'complete' && result.info === 'OK') {
-        observer.next(result.regeocode);
-        observer.complete();
-      } else {
-        observer.error(result);
+        observer.next(result.regeocode)
+        observer.complete()
       }
-    });
-  });
+      else {
+        observer.error(result)
+      }
+    })
+  })
 }
 
 export const regeo2IGeo = (lnglat: AMap.LngLat): Observable<IGeo> =>
@@ -62,38 +63,41 @@ export const regeo2IGeo = (lnglat: AMap.LngLat): Observable<IGeo> =>
           latitude: lnglat.getLat(),
         },
         regeocode,
-      };
+      }
       if (regeocode.aois && regeocode.aois.length != 0) {
-        res.address = regeocode.aois[0].name;
-        res.fullAddress = regeocode.formattedAddress;
-      } else {
+        res.address = regeocode.aois[0].name
+        res.fullAddress = regeocode.formattedAddress
+      }
+      else {
         // console.log('err');
         // throw new Error('无法解析该位置信息');
-        res.address = '当前位置';
-        res.fullAddress = '';
+        res.address = '当前位置'
+        res.fullAddress = ''
       }
-      return of(res);
-    })
-  );
+      return of(res)
+    }),
+  )
 
-  export class regeoGeoModel {
-    // 注意这个是私有的, 组件不需要关心这个.
-    private regeoNeedsUpdate = new Subject()
-    private lnglat = new BehaviorSubject(new AMap.LngLat(113.922869, 22.515923))
-    // private lnglat = new BehaviorSubject([113.922869, 22.515923])
-    public geo = combineLatest([
-      this.lnglat.pipe(debounceTime(2000)),
-      this.regeoNeedsUpdate,
-    ])
-      .pipe(
-        switchMap(([lnglat]) => {
-          return regeo2IGeo(lnglat)
-        })
-      )
-    public updateLngLat(lnglat: AMap.LngLat) {
-      this.lnglat.next(lnglat)
-    }
-    public refresh() {
-      this.regeoNeedsUpdate.next(true);
-    }
+export class regeoGeoModel {
+  // 注意这个是私有的, 组件不需要关心这个.
+  private regeoNeedsUpdate = new Subject()
+  private lnglat = new BehaviorSubject(new AMap.LngLat(113.922869, 22.515923))
+  // private lnglat = new BehaviorSubject([113.922869, 22.515923])
+  public geo = combineLatest([
+    this.lnglat.pipe(debounceTime(2000)),
+    this.regeoNeedsUpdate,
+  ])
+    .pipe(
+      switchMap(([lnglat]) => {
+        return regeo2IGeo(lnglat)
+      }),
+    )
+
+  public updateLngLat(lnglat: AMap.LngLat) {
+    this.lnglat.next(lnglat)
   }
+
+  public refresh() {
+    this.regeoNeedsUpdate.next(true)
+  }
+}

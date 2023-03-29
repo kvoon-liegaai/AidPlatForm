@@ -8,9 +8,9 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-const { configure } = require('quasar/wrappers');
+const { configure } = require('quasar/wrappers')
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure((/* ctx */) => {
   return {
     eslint: {
       // fix: true,
@@ -99,7 +99,7 @@ module.exports = configure(function (/* ctx */) {
                   // alias
                   ['useFetch', 'useMyFetch'], // import { useFetch as useMyFetch } from '@vueuse/core',
                 ],
-                axios: [
+                'axios': [
                   // default imports
                   ['default', 'axios'], // import { default as axios } from 'axios',
                 ],
@@ -168,9 +168,9 @@ module.exports = configure(function (/* ctx */) {
         '/api': {
           target: 'http://localhost:3000',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
-        }
-      }
+          rewrite: path => path.replace(/^\/api/, ''),
+        },
+      },
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
@@ -286,5 +286,5 @@ module.exports = configure(function (/* ctx */) {
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}
     },
-  };
-});
+  }
+})

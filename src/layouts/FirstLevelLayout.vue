@@ -1,7 +1,11 @@
+<script setup lang='ts'>
+import HeaderBar from 'src/components/HeaderBar.vue'
+</script>
+
 <template>
   <q-layout view="hHh lpr fFf">
     <q-header bordered class="bg-white text-black" height-hint="98">
-      <header-bar></header-bar>
+      <HeaderBar />
     </q-header>
 
     <q-page-container>
@@ -16,13 +20,7 @@
         <q-route-tab active-class="text-primary" label="Profile" icon="badge" to="/profile" exact />
       </q-tabs>
     </q-footer>
-
   </q-layout>
 </template>
-
-<script setup lang='ts'>
-import HeaderBar from 'src/components/HeaderBar.vue';
-
-</script>
 
 <style lang='scss' scoped></style>

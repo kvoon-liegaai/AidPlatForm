@@ -1,9 +1,9 @@
 /* Export date: 13-03-2023 14:52:00 */
 export const theme = {
   colors: {
-    white: '#FFFFFF',
-    black: '#000000',
-    primary: {
+    'white': '#FFFFFF',
+    'black': '#000000',
+    'primary': {
       100: '#ebfdff',
       150: '#c8f9ff',
       200: '#a6f5ff',
@@ -23,7 +23,7 @@ export const theme = {
       900: '#001d21',
       DEFAULT: '#00bdd6',
     },
-    secondary: {
+    'secondary': {
       100: '#f5f2fd',
       150: '#e7def9',
       200: '#d9cbf6',
@@ -43,7 +43,7 @@ export const theme = {
       900: '#1d0b41',
       DEFAULT: '#8353e2',
     },
-    info: {
+    'info': {
       100: '#f0f8fe',
       150: '#d4ebfd',
       200: '#b8defc',
@@ -63,7 +63,7 @@ export const theme = {
       900: '#021b2f',
       DEFAULT: '#1091f4',
     },
-    warning: {
+    'warning': {
       100: '#fef8f1',
       150: '#fcecd9',
       200: '#fae0c2',
@@ -83,7 +83,7 @@ export const theme = {
       900: '#271603',
       DEFAULT: '#ef9834',
     },
-    danger: {
+    'danger': {
       100: '#fef0f1',
       150: '#fdd7d8',
       200: '#fbbdbf',
@@ -103,7 +103,7 @@ export const theme = {
       900: '#3b0305',
       DEFAULT: '#f22128',
     },
-    success: {
+    'success': {
       100: '#eefdf3',
       150: '#d3f9e0',
       200: '#b8f5cd',
@@ -287,11 +287,11 @@ export const theme = {
       Sz27: '64rem',
     },
     borderRadius: {
-      xs: '0.125rem',
-      s: '0.1875rem',
-      m: '0.25rem',
-      l: '0.375rem',
-      xl: '0.5rem',
+      'xs': '0.125rem',
+      's': '0.1875rem',
+      'm': '0.25rem',
+      'l': '0.375rem',
+      'xl': '0.5rem',
       '100-percent': '100%',
     },
     boxShadow: {
@@ -302,4 +302,4 @@ export const theme = {
       xl: '0px 17px 35px rgba(23, 26, 31, 0.24), 0px 0px 2px rgba(23, 26, 31, 0.12)',
     },
   },
-};
+}

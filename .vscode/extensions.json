@@ -1,16 +1,16 @@
 {
-  "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "editorconfig.editorconfig",
-    "vue.volar",
-    "wayou.vscode-todo-highlight",
-    "abdelaziz18003.quasar-snippets"
+  recommendations: [
+    'dbaeumer.vscode-eslint',
+    'esbenp.prettier-vscode',
+    'editorconfig.editorconfig',
+    'vue.volar',
+    'wayou.vscode-todo-highlight',
+    'abdelaziz18003.quasar-snippets'
   ],
-  "unwantedRecommendations": [
-    "octref.vetur",
-    "hookyqr.beautify",
-    "dbaeumer.jshint",
-    "ms-vscode.vscode-typescript-tslint-plugin"
-  ]
+  unwantedRecommendations: [
+    'octref.vetur',
+    'hookyqr.beautify',
+    'dbaeumer.jshint',
+    'ms-vscode.vscode-typescript-tslint-plugin'
+  ],
 }

@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia';
-import { useGeolocation } from '@vueuse/core';
+import { defineStore } from 'pinia'
+import { useGeolocation } from '@vueuse/core'
 
 export const useGeoStore = defineStore('geo', () => {
   const geoLoc = useGeolocation({
     immediate: true,
-  });
-  return geoLoc;
-});
+  })
+  return geoLoc
+})

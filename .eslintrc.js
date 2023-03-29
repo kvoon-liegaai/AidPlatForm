@@ -22,7 +22,8 @@ module.exports = {
   // Rules order is important, please avoid shuffling them
   extends: [
     // Base ESLint recommended rules
-    // 'eslint:recommended',
+    'eslint:recommended',
+    '@antfu',
 
     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage
     // ESLint typescript rules
@@ -37,7 +38,7 @@ module.exports = {
 
     // https://github.com/prettier/eslint-config-prettier#installation
     // usage with Prettier, provided by 'eslint-config-prettier'.
-    'prettier',
+    // 'prettier',
   ],
 
   plugins: [
@@ -71,6 +72,8 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'no-console' : 'off',
+    'no-alert' : 'off',
 
     quotes: ['warn', 'single', { avoidEscape: true }],
 

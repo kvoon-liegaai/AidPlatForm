@@ -1,38 +1,41 @@
-<template>
-  <section id="pin-marker" :class="theme2StyleClass[props.themeColor]" @click="onClick">
-    <div class="pin-marker__board" :class="props.status != LoadStatus.PREPARED ? 'pin-marker__board_unprepared' : ''">
-      <!-- 用于 grid 布局占位未来可能展示图片 -->
-      <div></div>
-      <div v-show="props.status == LoadStatus.PREPARED" class="pin-marker__board__text">{{ location }}</div>
-      <Icon v-show="props.status == LoadStatus.PREPARED && props.onClick" icon="ic:round-keyboard-arrow-right"
-        color="#fcfcfc" width="20" />
-      <div class="pin-marker__board__pending-dot" v-show="props.status === LoadStatus.PENDING"></div>
-      <div class="pin-marker__board__loading-wave" v-show="props.status === LoadStatus.LOADING">
-        <Icon icon="eos-icons:three-dots-loading" color="#fcfcfc" width="30" height="30" />
-      </div>
-    </div>
-    <div class="pin-marker__needle"></div>
-    <!-- <button @click="onClick">click</button> -->
-  </section>
-</template>
-
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
-import { LoadStatus } from 'src/types/status';
+import { Icon } from '@iconify/vue'
+import { LoadStatus } from 'src/types/status'
 
 const props = defineProps<{
-  location: string;
-  themeColor: keyof typeof theme2StyleClass;
-  status: LoadStatus;
-  onClick?: () => unknown;
+  location: string
+  themeColor: keyof typeof theme2StyleClass
+  status: LoadStatus
+  onClick?: () => unknown
 }>()
-
 
 const theme2StyleClass = {
   primary: 'pin-marker_theme-primary',
   orange: 'pin-marker_theme-orange',
 }
 </script>
+
+<template>
+  <section id="pin-marker" :class="theme2StyleClass[props.themeColor]" @click="onClick">
+    <div class="pin-marker__board" :class="props.status != LoadStatus.PREPARED ? 'pin-marker__board_unprepared' : ''">
+      <!-- 用于 grid 布局占位未来可能展示图片 -->
+      <div />
+      <div v-show="props.status == LoadStatus.PREPARED" class="pin-marker__board__text">
+        {{ location }}
+      </div>
+      <Icon
+        v-show="props.status == LoadStatus.PREPARED && props.onClick" icon="ic:round-keyboard-arrow-right"
+        color="#fcfcfc" width="20"
+      />
+      <div v-show="props.status === LoadStatus.PENDING" class="pin-marker__board__pending-dot" />
+      <div v-show="props.status === LoadStatus.LOADING" class="pin-marker__board__loading-wave">
+        <Icon icon="eos-icons:three-dots-loading" color="#fcfcfc" width="30" height="30" />
+      </div>
+    </div>
+    <div class="pin-marker__needle" />
+    <!-- <button @click="onClick">click</button> -->
+  </section>
+</template>
 
 <style lang='scss' scoped>
 .pin-marker_theme-primary {

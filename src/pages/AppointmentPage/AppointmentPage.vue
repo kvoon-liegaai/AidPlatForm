@@ -1,3 +1,7 @@
+<script setup lang='ts'>
+const tab = ref('all')
+</script>
+
 <template>
   <div class="q-gutter-y-md">
     <q-tabs v-model="tab" narrow-indicator dense align="justify" class="text-primary bg-coolGray-1">
@@ -12,9 +16,12 @@
         <q-badge rounded color="green" label="未开始" absolute top-0 right-0 m-2 />
         <q-card-section horizontal>
           <q-card-section class="q-pt-xs">
-            <div class="text-overline">3 月 12
+            <div class="text-overline">
+              3 月 12
             </div>
-            <div class="text-h5 q-mt-sm q-mb-xs">早上陪跑</div>
+            <div class="text-h5 q-mt-sm q-mb-xs">
+              早上陪跑
+            </div>
             <div class="text-caption text-grey">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
               dolore magna aliqua.
@@ -46,9 +53,5 @@
     </section>
   </div>
 </template>
-
-<script setup lang='ts'>
-const tab = ref('all');
-</script>
 
 <style lang='scss' scoped></style>

@@ -1,31 +1,6 @@
-<template>
-  <!-- <q-toolbar class=" bg-white">
-    <q-toolbar-title>
-      服务列表
-    </q-toolbar-title>
-    <q-btn flat round dense icon="more_vert" />
-  </q-toolbar> -->
-  <!-- <q-bar dark class="bg-primary text-white"> -->
-  <q-page padding class="homepage">
-    <div class="shortcut shadow-md" grid grid-cols-4 mb-4 rounded-2 overflow-hidden h-20
-      v-for="(shortcut, key) in shortcuts" :key="key">
-      <div class="shortcut__img" col-span-1>
-        <q-img :src="shortcut.imgSrc" :ratio="3 / 4" h-20 />
-      </div>
-      <div class="shortcut__panel" :class="shortcut.bg" col-span-3 flex justify-between px-2 items-center>
-        <div class="shortcut__panel__title text-[#00454FFF] font-bold text-xl">{{ shortcut.title }}</div>
-        <div class="shortcut__panel__btn">
-          <q-btn :color="shortcut.btn.bg" :label="shortcut.btn.label" @click="shortcut.btn.onClick" />
-        </div>
-      </div>
-    </div>
-    <sub-area v-for="(subArea, key) in subAreas" :key="key" :subArea="subArea"></sub-area>
-  </q-page>
-</template>
-
 <script setup lang='ts'>
-import { useQuasar } from 'quasar';
-import SubArea from './components/SubArea.vue';
+import { useQuasar } from 'quasar'
+import SubArea from './components/SubArea.vue'
 import { subAreas } from './model'
 const router = useRouter()
 
@@ -52,12 +27,12 @@ const shortcuts = [
       onClick: quickMatch,
     },
   },
-];
+]
 
 // TODO:
 // function checkMatchSheet() {}
 
-const { dialog } = useQuasar();
+const { dialog } = useQuasar()
 
 function quickMatch() {
   dialog({
@@ -68,8 +43,8 @@ function quickMatch() {
     },
     cancel: {
       push: true,
-      color: 'negative'
-    }
+      color: 'negative',
+    },
   })
     .onOk(() => {
       console.log('ok')
@@ -80,5 +55,34 @@ function quickMatch() {
     })
 }
 </script>
+
+<template>
+  <!-- <q-toolbar class=" bg-white">
+    <q-toolbar-title>
+      服务列表
+    </q-toolbar-title>
+    <q-btn flat round dense icon="more_vert" />
+  </q-toolbar> -->
+  <!-- <q-bar dark class="bg-primary text-white"> -->
+  <q-page padding class="homepage">
+    <div
+      v-for="(shortcut, key) in shortcuts" :key="key" class="shortcut shadow-md" grid grid-cols-4 mb-4 rounded-2
+      overflow-hidden h-20
+    >
+      <div class="shortcut__img" col-span-1>
+        <q-img :src="shortcut.imgSrc" :ratio="3 / 4" h-20 />
+      </div>
+      <div class="shortcut__panel" :class="shortcut.bg" col-span-3 flex justify-between px-2 items-center>
+        <div class="shortcut__panel__title text-[#00454FFF] font-bold text-xl">
+          {{ shortcut.title }}
+        </div>
+        <div class="shortcut__panel__btn">
+          <q-btn :color="shortcut.btn.bg" :label="shortcut.btn.label" @click="shortcut.btn.onClick" />
+        </div>
+      </div>
+    </div>
+    <SubArea v-for="(subArea, key) in subAreas" :key="key" :sub-area="subArea" />
+  </q-page>
+</template>
 
 <style lang='scss' scoped></style>

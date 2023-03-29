@@ -1,75 +1,45 @@
-<template>
-  <section class="quick-match">
-    <q-layout view="lHh lpr lFf" container h-screen>
-      <q-header>
-        <back-bar title="位置选择"></back-bar>
-        <!-- {{ geoStore.coords.longitude + " " + geoStore.coords.latitude }} -->
-      </q-header>
-
-      <q-page-container>
-        <q-page relative>
-          <div id="map-container"></div>
-          <pin-marker-vue id="pin" :location="cardInfo.address" theme-color="primary"
-            :status="pinStatus"></pin-marker-vue>
-          <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
-            <q-card-section class="bg-grey-8 text-white">
-              <div class="text-h6">{{ cardInfo.address }}
-                <!-- <span text-sm>附近</span> -->
-              </div>
-              <div class="text-subtitle2" truncate>{{ cardInfo.fullAddress }}</div>
-            </q-card-section>
-
-            <q-card-actions vertical align="center" @click="onConfirm">
-              <q-btn flat w-full font-bold :disable="pinStatus != LoadStatus.PREPARED">确认</q-btn>
-            </q-card-actions>
-          </q-card>
-        </q-page>
-      </q-page-container>
-    </q-layout>
-  </section>
-</template>
-
 <script setup lang='ts'>
-import BackBar from 'src/components/BackBar.vue';
-import { Notify, useQuasar } from 'quasar';
-import { useDefaultCoords } from 'src/composition/geo';
-import { useGeoStore } from 'src/stores/geo';
-import PinMarkerVue from 'src/components/PinMarker.vue';
-import { LoadStatus } from 'src/types/status';
-import { catchError, debounceTime, EMPTY, merge, Observable, of, switchMap, tap } from 'rxjs'
+import BackBar from 'src/components/BackBar.vue'
+import { Notify } from 'quasar'
+import { useDefaultCoords } from 'src/composition/geo'
+import { useGeoStore } from 'src/stores/geo'
+import PinMarkerVue from 'src/components/PinMarker.vue'
+import { LoadStatus } from 'src/types/status'
+import { debounceTime, merge, switchMap, tap } from 'rxjs'
 import { fromEvent, toObserver, useSubscription } from '@vueuse/rxjs'
-import { useLocalStorage } from '@vueuse/core';
-import { defaultQuickMatchSheet, IGeo, IQuickMatchSheet } from 'src/types';
-import { regeo2IGeo } from 'src/utils/map';
+import { useLocalStorage } from '@vueuse/core'
+import type { IGeo, IQuickMatchSheet } from 'src/types'
+import { defaultQuickMatchSheet } from 'src/types'
+import { regeo2IGeo } from 'src/utils/map'
 
-const geoStore = useGeoStore();
+const geoStore = useGeoStore()
 const quickMatchForm = useLocalStorage<IQuickMatchSheet>('quickMatchForm', defaultQuickMatchSheet)
 
-let mapObj: AMap.Map;
+let mapObj: AMap.Map
 // let pinMarker: AMap.Marker;
-let pinStatus = ref(LoadStatus.LOADING);
-let selfMarker: AMap.Marker;
+const pinStatus = ref(LoadStatus.LOADING)
+let selfMarker: AMap.Marker
 
-const cardInfo =
+const cardInfo
   // useLocalStorage('quickMatchForm')
-  ref<IGeo>({
+  = ref<IGeo>({
     address: '',
     fullAddress: '',
     lnglat: useDefaultCoords('object'),
-    regeocode: {}
+    regeocode: {},
   })
 
 function onConfirm() {
   if (pinStatus.value === LoadStatus.LOADING) {
     Notify.create({ message: '请先选好位置', position: 'top' })
-    return;
+    return
   }
 
-  quickMatchForm.value.geo = cardInfo.value;
+  quickMatchForm.value.geo = cardInfo.value
 }
 
 onMounted(() => {
-  let center: [number, number];
+  let center: [number, number]
 
   nextTick(() => {
     if (!AMap) {
@@ -79,11 +49,11 @@ onMounted(() => {
 
     // center
     if (!geoStore.error && geoStore.coords.latitude != Infinity && geoStore.coords.longitude != Infinity) {
-      center = [geoStore.coords.longitude, geoStore.coords.latitude];
+      center = [geoStore.coords.longitude, geoStore.coords.latitude]
     }
     else {
-      center = useDefaultCoords('array');
-      Notify.create({ message: geoStore.error?.code + ':未获取到您的位置，已为您设置到 app 默认地址' })
+      center = useDefaultCoords('array')
+      Notify.create({ message: `${geoStore.error?.code}:未获取到您的位置，已为您设置到 app 默认地址` })
       console.log('geoStore.error', geoStore.error)
     }
     console.log('center', center)
@@ -95,11 +65,11 @@ onMounted(() => {
     })
 
     // map essential event ->  observable
-    // @ts-ignore
+    // @ts-expect-error
     const mapComplete$ = fromEvent(mapObj, 'complete')
-    // @ts-ignore
+    // @ts-expect-error
     const mapMove$ = fromEvent(mapObj, 'mapmove')
-    // @ts-ignore
+    // @ts-expect-error
     const mapMoveEnd$ = fromEvent(mapObj, 'moveend')
 
     // card info observable
@@ -107,14 +77,14 @@ onMounted(() => {
     const geoFromMapComplete$ = mapComplete$
       .pipe(
         switchMap(() => regeo2IGeo(mapObj.getCenter())),
-        tap((info) => console.log('获取中心点位置', info)),
+        tap(info => console.log('获取中心点位置', info)),
       )
     // part 2: debounce(map move end) -> card info
     const geoFromMapMoveEnd_debounced$ = mapMoveEnd$
       .pipe(
         debounceTime(1000),
         switchMap(() => regeo2IGeo(mapObj.getCenter())),
-        tap((info) => console.log('获取中心点位置', info)),
+        tap(info => console.log('获取中心点位置', info)),
       )
     // merge
     const geo$ = merge(geoFromMapComplete$, geoFromMapMoveEnd_debounced$)
@@ -126,24 +96,24 @@ onMounted(() => {
             if (geo.address === '当前位置')
               Notify.create({ message: '无效的地理位置', position: 'top' })
             else
-              pinStatus.value = LoadStatus.PREPARED;
+              pinStatus.value = LoadStatus.PREPARED
           }),
         )
         .subscribe(
           toObserver(cardInfo),
-        )
+        ),
     )
 
     useSubscription(
       mapMove$
         .pipe(tap(() => pinStatus.value = LoadStatus.LOADING))
-        .subscribe()
+        .subscribe(),
     )
 
     // self marker
     if (!geoStore.error) {
-      selfMarker = new AMap.Marker({ position: center });
-      selfMarker.addTo(mapObj);
+      selfMarker = new AMap.Marker({ position: center })
+      selfMarker.addTo(mapObj)
       watchEffect(() => {
         selfMarker.setPosition([geoStore.coords.longitude, geoStore.coords.latitude])
       })
@@ -152,9 +122,47 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  mapObj.destroy();
+  mapObj.destroy()
 })
 </script>
+
+<template>
+  <section class="quick-match">
+    <q-layout view="lHh lpr lFf" container h-screen>
+      <q-header>
+        <BackBar title="位置选择" />
+        <!-- {{ geoStore.coords.longitude + " " + geoStore.coords.latitude }} -->
+      </q-header>
+
+      <q-page-container>
+        <q-page relative>
+          <div id="map-container" />
+          <PinMarkerVue
+            id="pin" :location="cardInfo.address" theme-color="primary"
+            :status="pinStatus"
+          />
+          <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
+            <q-card-section class="bg-grey-8 text-white">
+              <div class="text-h6">
+                {{ cardInfo.address }}
+                <!-- <span text-sm>附近</span> -->
+              </div>
+              <div class="text-subtitle2" truncate>
+                {{ cardInfo.fullAddress }}
+              </div>
+            </q-card-section>
+
+            <q-card-actions vertical align="center" @click="onConfirm">
+              <q-btn flat w-full font-bold :disable="pinStatus != LoadStatus.PREPARED">
+                确认
+              </q-btn>
+            </q-card-actions>
+          </q-card>
+        </q-page>
+      </q-page-container>
+    </q-layout>
+  </section>
+</template>
 
 <style lang='scss' scoped>
 #map-container {

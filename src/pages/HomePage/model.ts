@@ -1,15 +1,15 @@
 export interface ISubArea {
-  name: string;
-  subtitle: string;
+  name: string
+  subtitle: string
   cards: {
     icon: {
-      name: string;
-      color: string;
-      background: string;
-    };
-    title: string;
-    desc: string;
-  }[];
+      name: string
+      color: string
+      background: string
+    }
+    title: string
+    desc: string
+  }[]
 }
 
 export const subAreas: ISubArea[] = [
@@ -103,6 +103,6 @@ export const subAreas: ISubArea[] = [
       },
     ],
   },
-];
+]
 
-export const subAreasName = subAreas.map((subArea) => subArea.name);
+export const subAreasName = subAreas.map(subArea => subArea.name)

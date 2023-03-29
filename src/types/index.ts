@@ -1,22 +1,22 @@
-import { useDefaultCoords } from 'src/composition/geo';
+import { useDefaultCoords } from 'src/composition/geo'
 
 interface IGeo {
-  address: string;
-  fullAddress: string;
+  address: string
+  fullAddress: string
   lnglat: {
-    longitude: number;
-    latitude: number;
-  };
-  regeocode: any;
+    longitude: number
+    latitude: number
+  }
+  regeocode: any
 }
 
 interface IQuickMatchSheet {
-  subareaName: string;
+  subareaName: string
   date: {
-    from: string;
-    to: string;
-  };
-  geo: IGeo;
+    from: string
+    to: string
+  }
+  geo: IGeo
 }
 
 const defaultQuickMatchSheet = {
@@ -31,8 +31,8 @@ const defaultQuickMatchSheet = {
     lnglat: useDefaultCoords('object'),
     regeocode: {},
   },
-};
+}
 
-export type { IGeo, IQuickMatchSheet };
+export type { IGeo, IQuickMatchSheet }
 
-export { defaultQuickMatchSheet };
+export { defaultQuickMatchSheet }
