@@ -18,8 +18,8 @@
       </div>
       <q-form v-if="tab === 'login'" ref="loginFormRef" @submit="onLoginSubmit" @reset="onFormReset(loginFormRef)"
         class="q-gutter-md">
-        <q-input outlined v-model="loginForm.email" label="账号 *" hint="账号" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入账号']" />
+        <q-input outlined v-model="loginForm.username" label="用户名 *" hint="用户名" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入用户名']" />
 
         <q-input type='password' outlined v-model="loginForm.password" label="密码 *" hint="密码" lazy-rules
           :rules="[val => val && val.length > 0 || '请输入密码']" />
@@ -54,8 +54,11 @@
 
 <script setup lang="ts">
 import { QForm } from 'quasar';
+import { AuthService } from 'src/api/adp';
 
-const router = useRouter();
+// const router = useRouter()
+
+const authService = new AuthService();
 
 // login sign up controller
 
@@ -72,14 +75,20 @@ function onFormReset(form: QForm | undefined) {
 
 const loginFormRef = ref<QForm | undefined>();
 const loginForm = reactive({
-  email: '',
+  username: '',
   password: '',
   accept: false,
 })
 
 function onLoginSubmit() {
   console.log('提交表单 login in')
-  router.push('/home')
+  authService.login(loginForm.username, loginForm.password)
+    .subscribe({
+      error: () => {
+        alert('Login failed');
+      }
+    });
+  // router.push('/home')
 }
 
 // sign up
