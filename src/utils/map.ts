@@ -33,7 +33,7 @@
 //   console.log('data.message', data.message)
 // }
 
-import { Observable, switchMap, of } from 'rxjs';
+import { Observable, switchMap, of, BehaviorSubject, Subject, combineLatest, combineLatestAll, debounce, debounceTime  } from 'rxjs';
 import { IGeo } from 'src/types';
 
 export function getReGeo(lnglat: AMap.LngLat): Observable<any> {
@@ -75,3 +75,25 @@ export const regeo2IGeo = (lnglat: AMap.LngLat): Observable<IGeo> =>
       return of(res);
     })
   );
+
+  export class regeoGeoModel {
+    // 注意这个是私有的, 组件不需要关心这个.
+    private regeoNeedsUpdate = new Subject()
+    private lnglat = new BehaviorSubject(new AMap.LngLat(113.922869, 22.515923))
+    // private lnglat = new BehaviorSubject([113.922869, 22.515923])
+    public geo = combineLatest([
+      this.lnglat.pipe(debounceTime(2000)),
+      this.regeoNeedsUpdate,
+    ])
+      .pipe(
+        switchMap(([lnglat]) => {
+          return regeo2IGeo(lnglat)
+        })
+      )
+    public updateLngLat(lnglat: AMap.LngLat) {
+      this.lnglat.next(lnglat)
+    }
+    public refresh() {
+      this.regeoNeedsUpdate.next(true);
+    }
+  }
