@@ -72,8 +72,11 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    'no-console' : 'off',
-    'no-alert' : 'off',
+    'no-console': 'off',
+    'no-alert': 'off',
+    'vue/first-attribute-linebreak': 'off',
+    'vue/html-indent': 'off',
+    'vue/html-closing-bracket-newline': 'off',
 
     quotes: ['warn', 'single', { avoidEscape: true }],
 

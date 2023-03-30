@@ -1,7 +1,7 @@
 import { useStorage } from '@vueuse/core'
 import { BehaviorSubject } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { login } from 'src/api/adp'
+import { login } from 'src/service/api/adp.api'
 
 export class AuthService {
   public name = 'authService'

@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { AuthService } from 'src/service/auth'
+import { AuthService } from 'src/service/auth.service'
 
 const logout = () => {
   AuthService.getInstance().logout()

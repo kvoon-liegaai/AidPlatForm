@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { authService } from './service/auth'
 import { useRouter } from 'vue-router'
-import { AuthService } from './service/auth'
+import { AuthService } from './service/auth.service'
 import { useGeoStore } from './stores/geo'
 
 const router = useRouter()

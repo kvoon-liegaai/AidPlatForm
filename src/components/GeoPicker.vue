@@ -4,10 +4,10 @@ import { useDefaultCoords } from 'src/composition/geo'
 import { useGeoStore } from 'src/stores/geo'
 import PinMarkerVue from 'src/components/PinMarker.vue'
 import { LoadStatus } from 'src/types/status'
-import { debounceTime, merge, switchMap, tap } from 'rxjs'
+import { debounceTime, merge, tap } from 'rxjs'
 import { fromEvent, toObserver, useSubscription } from '@vueuse/rxjs'
 import type { IGeo } from 'src/types'
-import { regeo2IGeo } from 'src/utils/map'
+import { GeoService } from 'src/service/geo.service'
 
 const props = defineProps<{
   source?: {
@@ -22,6 +22,8 @@ const emits = defineEmits<{
 
 const geoStore = useGeoStore() // self geo location
 
+const geoService = new GeoService()
+
 let mapObj: AMap.Map
 // let pinMarker: AMap.Marker;
 const pinStatus = ref(LoadStatus.LOADING)
@@ -33,6 +35,22 @@ const cardInfo = ref<IGeo>({
   lnglat: useDefaultCoords('object'),
   regeocode: {},
 })
+
+useSubscription(
+  geoService.geo
+    .pipe(
+      tap((geo) => {
+        console.log('geo', geo)
+        if (geo.address === '当前位置')
+          Notify.create({ message: '无效的地理位置', position: 'top' })
+        else
+          pinStatus.value = LoadStatus.PREPARED
+      }),
+    )
+    .subscribe(
+      toObserver(cardInfo),
+    ),
+)
 
 function onConfirm() {
   if (pinStatus.value === LoadStatus.LOADING) {
@@ -51,22 +69,21 @@ onMounted(() => {
       return
     }
 
-    // center
+    // init center
+
+    // center from source exist
     if (props.source) {
-      // center from source exist
       center = [props.source.longitude, props.source.latitude]
     }
     else {
-      if (!geoStore.error && geoStore.coords.latitude != Infinity && geoStore.coords.longitude != Infinity) {
-        // center from self geolocation
+      // center from self geolocation
+      if (!geoStore.error && geoStore.coords.latitude !== Infinity && geoStore.coords.longitude !== Infinity)
         center = [geoStore.coords.longitude, geoStore.coords.latitude]
-      }
-      else {
-        // center from default geolocation
-        center = useDefaultCoords('array')
-        Notify.create({ message: `${geoStore.error?.code}:未获取到您的位置，已为您设置到 app 默认地址` })
-        console.log('geoStore.error', geoStore.error)
-      }
+
+      // center from default geolocation
+      center = useDefaultCoords('array')
+      Notify.create({ message: `${geoStore.error?.code}:未获取到您的位置，已为您设置到 app 默认地址` })
+      console.log('geoStore.error', geoStore.error)
     }
     console.log('center', center)
 
@@ -84,42 +101,20 @@ onMounted(() => {
     // @ts-expect-error
     const mapMoveEnd$ = fromEvent(mapObj, 'moveend')
 
-    // card info observable
-    // part 1: map complete -> card info
-    const geoFromMapComplete$ = mapComplete$
-      .pipe(
-        switchMap(() => regeo2IGeo(mapObj.getCenter())),
-        tap(info => console.log('获取中心点位置', info)),
-      )
-    // part 2: debounce(map move end) -> card info
-    const geoFromMapMoveEnd_debounced$ = mapMoveEnd$
-      .pipe(
-        debounceTime(1000),
-        switchMap(() => regeo2IGeo(mapObj.getCenter())),
-        tap(info => console.log('获取中心点位置', info)),
-      )
-    // merge
-    const geo$ = merge(geoFromMapComplete$, geoFromMapMoveEnd_debounced$)
-
     useSubscription(
-      geo$
-        .pipe(
-          tap((geo) => {
-            if (geo.address === '当前位置')
-              Notify.create({ message: '无效的地理位置', position: 'top' })
-            else
-              pinStatus.value = LoadStatus.PREPARED
-          }),
-        )
-        .subscribe(
-          toObserver(cardInfo),
-        ),
+      merge(
+        mapComplete$,
+        mapMoveEnd$.pipe(debounceTime(1000)),
+      )
+        .subscribe(() => {
+          console.log('获取中心点位置')
+          geoService.updateLngLat(mapObj.getCenter())
+        }),
     )
 
     useSubscription(
       mapMove$
-        .pipe(tap(() => pinStatus.value = LoadStatus.LOADING))
-        .subscribe(),
+        .subscribe(() => pinStatus.value = LoadStatus.LOADING),
     )
 
     // self marker
@@ -155,7 +150,7 @@ onUnmounted(() => {
 
       <!-- <q-card-actions vertical align="center" @click="onConfirm"> -->
       <q-card-actions vertical align="center" @click="onConfirm">
-        <q-btn flat w-full font-bold :disable="pinStatus != LoadStatus.PREPARED">
+        <q-btn flat w-full font-bold :disable="pinStatus !== LoadStatus.PREPARED">
           确认
         </q-btn>
       </q-card-actions>

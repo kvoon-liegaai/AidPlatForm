@@ -17,16 +17,14 @@ const theme2StyleClass = {
 
 <template>
   <section id="pin-marker" :class="theme2StyleClass[props.themeColor]" @click="onClick">
-    <div class="pin-marker__board" :class="props.status != LoadStatus.PREPARED ? 'pin-marker__board_unprepared' : ''">
+    <div class="pin-marker__board" :class="props.status !== LoadStatus.PREPARED ? 'pin-marker__board_unprepared' : ''">
       <!-- 用于 grid 布局占位未来可能展示图片 -->
       <div />
-      <div v-show="props.status == LoadStatus.PREPARED" class="pin-marker__board__text">
+      <div v-show="props.status === LoadStatus.PREPARED" class="pin-marker__board__text">
         {{ location }}
       </div>
-      <Icon
-        v-show="props.status == LoadStatus.PREPARED && props.onClick" icon="ic:round-keyboard-arrow-right"
-        color="#fcfcfc" width="20"
-      />
+      <Icon v-show="props.status === LoadStatus.PREPARED && props.onClick" icon="ic:round-keyboard-arrow-right"
+        color="#fcfcfc" width="20" />
       <div v-show="props.status === LoadStatus.PENDING" class="pin-marker__board__pending-dot" />
       <div v-show="props.status === LoadStatus.LOADING" class="pin-marker__board__loading-wave">
         <Icon icon="eos-icons:three-dots-loading" color="#fcfcfc" width="30" height="30" />

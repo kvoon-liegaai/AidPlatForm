@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useSubscription } from '@vueuse/rxjs'
 import { QForm } from 'quasar'
-import { AuthService } from 'src/service/auth'
+import { AuthService } from 'src/service/auth.service'
 
 const router = useRouter()
 const authService = AuthService.getInstance()
@@ -42,6 +42,7 @@ const onLoginSubmit = () => {
     useSubscription(
       authService.loginAndSetToken(loginForm.username, loginForm.password)
         .subscribe({
+          next: console.log,
           error: () => {
             alert('Login failed')
           },
@@ -84,45 +85,31 @@ function onSignupSubmit() {
           </q-tabs>
         </div>
       </div>
-      <QForm
-        v-if="tab === 'login'" ref="loginFormRef" class="q-gutter-md" @submit="onLoginSubmit"
-        @reset="onFormReset(loginFormRef)"
-      >
-        <q-input
-          v-model="loginForm.username" outlined label="用户名 *" hint="用户名" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入用户名']"
-        />
+      <QForm v-if="tab === 'login'" ref="loginFormRef" class="q-gutter-md" @submit="onLoginSubmit"
+        @reset="onFormReset(loginFormRef)">
+        <q-input v-model="loginForm.username" outlined label="用户名 *" hint="用户名" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入用户名']" />
 
-        <q-input
-          v-model="loginForm.password" type="password" outlined label="密码 *" hint="密码" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入密码']"
-        />
+        <q-input v-model="loginForm.password" type="password" outlined label="密码 *" hint="密码" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入密码']" />
 
         <div>
           <q-btn label="登录" type="submit" color="primary" />
           <q-btn label="重置" type="reset" color="primary" flat class="q-ml-sm" />
         </div>
       </QForm>
-      <QForm
-        v-if="tab === 'signup'" ref="signupFormRef" class="q-gutter-md" @submit="onSignupSubmit"
-        @reset="onFormReset(signupFormRef)"
-      >
-        <q-input
-          v-model="signupForm.email" outlined label="账号 *" hint="账号" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入账号']"
-        />
+      <QForm v-if="tab === 'signup'" ref="signupFormRef" class="q-gutter-md" @submit="onSignupSubmit"
+        @reset="onFormReset(signupFormRef)">
+        <q-input v-model="signupForm.email" outlined label="账号 *" hint="账号" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入账号']" />
 
-        <q-input
-          v-model="signupForm.password" type="password" outlined label="密码 *" hint="密码" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入密码']"
-        />
+        <q-input v-model="signupForm.password" type="password" outlined label="密码 *" hint="密码" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入密码']" />
 
-        <q-input
-          v-model="signupForm.password2" type="password" outlined label="密码 *" hint="密码" lazy-rules :rules="[
-            val => val && val.length > 0 || '请再次输入密码',
-            val => val === signupForm.password || '两次密码不一致',
-          ]"
-        />
+        <q-input v-model="signupForm.password2" type="password" outlined label="密码 *" hint="密码" lazy-rules :rules="[
+          val => val && val.length > 0 || '请再次输入密码',
+          val => val === signupForm.password || '两次密码不一致',
+        ]" />
 
         <div>
           <q-btn label="注册" type="submit" color="primary" />
