@@ -12,7 +12,7 @@ const authService = AuthService.getInstance()
 authService.isLoggedIn().subscribe((val) => {
   if (!val) {
     console.log('router', router)
-    router.replace('/auth/login')
+    router.replace('/login')
   }
 })
 </script>
