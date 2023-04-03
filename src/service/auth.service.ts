@@ -12,6 +12,9 @@ export class AuthService {
   private constructor() {
     this.loggedIn = new BehaviorSubject(false)
     this.access_token = useStorage('access_token', null)
+    if (this.access_token)
+      this.loggedIn.next(true)
+    console.log('local storage access token: ', this.access_token.value)
   }
 
   public static getInstance(): AuthService {

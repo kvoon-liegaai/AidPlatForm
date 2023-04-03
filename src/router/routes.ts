@@ -70,6 +70,10 @@ const routes: RouteRecordRaw[] = [
         path: 'quick-match',
         component: () => import('pages/SettingPage/QuickMatch.vue'),
       },
+      {
+        path: 'provide-service',
+        component: () => import('pages/SettingPage/ProvideService.vue'),
+      },
     ],
   },
   {

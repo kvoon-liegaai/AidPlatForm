@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useSubscription } from '@vueuse/rxjs'
-import { QForm } from 'quasar'
+import { Notify, QForm } from 'quasar'
+import type { SignUpParams } from 'src/service/api/adp.api'
+import { Role, signUp } from 'src/service/api/adp.api'
 import { AuthService } from 'src/service/auth.service'
 
 const router = useRouter()
@@ -58,13 +60,30 @@ const signupFormRef = ref<QForm | undefined>()
 const signupForm = reactive({
   email: '',
   username: '',
+  nickname: '',
   password: '',
   password2: '',
 })
 
 function onSignupSubmit() {
-  console.log('提交表单 sign up')
-  alert('注册成功')
+  const { email, username, nickname, password } = signupForm
+  const params: SignUpParams = {
+    email,
+    username,
+    nickname,
+    password,
+    role: Role.Root,
+  }
+  signUp(params)
+    .subscribe({
+      next: (res) => {
+        console.log('res', res)
+      },
+      error: ({ response }) => {
+        console.log('err', response.message)
+        Notify.create(JSON.stringify(response.message))
+      },
+    })
 }
 </script>
 
@@ -85,6 +104,7 @@ function onSignupSubmit() {
           </q-tabs>
         </div>
       </div>
+      <!-- 登录 -->
       <QForm v-if="tab === 'login'" ref="loginFormRef" class="q-gutter-md" @submit="onLoginSubmit"
         @reset="onFormReset(loginFormRef)">
         <q-input v-model="loginForm.username" outlined label="用户名 *" hint="用户名" lazy-rules
@@ -98,15 +118,21 @@ function onSignupSubmit() {
           <q-btn label="重置" type="reset" color="primary" flat class="q-ml-sm" />
         </div>
       </QForm>
+      <!-- 注册 -->
       <QForm v-if="tab === 'signup'" ref="signupFormRef" class="q-gutter-md" @submit="onSignupSubmit"
         @reset="onFormReset(signupFormRef)">
-        <q-input v-model="signupForm.email" outlined label="账号 *" hint="账号" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入账号']" />
+        <q-input v-model="signupForm.username" outlined label="用户名 *" hint="用户名" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入用户名']" />
+        <q-input v-model="signupForm.nickname" outlined label="昵称 *" hint="昵称" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入昵称']" />
+
+        <q-input v-model="signupForm.email" outlined label="邮箱 *" hint="邮箱" lazy-rules
+          :rules="[val => val && val.length > 0 || '请输入邮箱']" />
 
         <q-input v-model="signupForm.password" type="password" outlined label="密码 *" hint="密码" lazy-rules
           :rules="[val => val && val.length > 0 || '请输入密码']" />
 
-        <q-input v-model="signupForm.password2" type="password" outlined label="密码 *" hint="密码" lazy-rules :rules="[
+        <q-input v-model="signupForm.password2" type="password" outlined label="确认密码 *" hint="密码" lazy-rules :rules="[
           val => val && val.length > 0 || '请再次输入密码',
           val => val === signupForm.password || '两次密码不一致',
         ]" />
