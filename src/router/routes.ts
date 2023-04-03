@@ -6,7 +6,7 @@ const routes: RouteRecordRaw[] = [
     redirect: '/home',
   },
   {
-    path: '/login',
+    path: '/auth/login',
     component: () => import('layouts/LoginLayout.vue'),
     children: [
       { path: '', component: () => import('pages/LoginPage/LoginPage.vue') },
@@ -81,6 +81,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/MapPage/GeoPick.vue'),
       },
     ],
+  },
+  {
+    path: '/test',
+    component: () => import('src/pages/TestTest.vue'),
   },
   // Always leave this as last one,
   // but you can also remove it
