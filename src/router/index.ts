@@ -1,5 +1,5 @@
 import { route } from 'quasar/wrappers'
-import { AuthService } from 'src/service/auth.service'
+import { AuthService } from 'src/service/auth/auth.service'
 import {
   createMemoryHistory,
   createRouter,
@@ -38,10 +38,11 @@ export default route((/* { store, ssrContext } */) => {
   Router.beforeEach((to, from, next) => {
     const isLoggedIn$ = AuthService.getInstance().isLoggedIn()
     let unSubIsLoggedIn = null
-    if (to.path !== '/login') {
+    if (to.path !== '/auth/login') {
       unSubIsLoggedIn = isLoggedIn$.subscribe((val) => {
+        console.log('val', val)
         if (!val)
-          next('/login')
+          next('/auth/login')
         else next()
       })
     }

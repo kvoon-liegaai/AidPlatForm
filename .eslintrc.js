@@ -23,6 +23,8 @@ module.exports = {
   extends: [
     // Base ESLint recommended rules
     'eslint:recommended',
+
+    // antfu eslint
     '@antfu',
 
     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage

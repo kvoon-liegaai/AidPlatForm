@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { authService } from './service/auth'
 import { useRouter } from 'vue-router'
-import { AuthService } from './service/auth.service'
+import { AuthService } from './service/auth/auth.service'
 import { useGeoStore } from './stores/geo'
 
 const router = useRouter()
@@ -12,7 +12,7 @@ const authService = AuthService.getInstance()
 authService.isLoggedIn().subscribe((val) => {
   if (!val) {
     console.log('router', router)
-    router.replace('/login')
+    router.replace('/auth/login')
   }
 })
 </script>

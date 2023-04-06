@@ -1,7 +1,9 @@
 <script setup lang='ts'>
 import BackBar from 'src/components/BackBar.vue'
 import GeoPicker from 'src/components/GeoPicker.vue'
-import type { IGeo } from 'src/types'
+import type { IGeo } from 'src/service/map/map.model'
+import { createHelpResource } from 'src/service/resource/resource.api'
+import type { CreateHelpResourceParams } from 'src/service/resource/resource.model'
 import { defaultProvideService } from 'src/types'
 import { subAreasName } from '../HomePage/model'
 
@@ -11,7 +13,9 @@ const showMapPicker = ref(false)
 
 const options = subAreasName
 
-const form = ref(defaultProvideService)
+const form = ref<CreateHelpResourceParams>(defaultProvideService)
+
+const addressName = ref('')
 
 function provideService() {
   isLoading.value = true
@@ -19,6 +23,9 @@ function provideService() {
     isLoading.value = false
   }, 3000)
   console.log('sq')
+  // form.value.geo = JSON.stringify(form.value.geo)
+  createHelpResource(form.value)
+    .subscribe(console.log)
 }
 
 function selectMap() {
@@ -27,7 +34,8 @@ function selectMap() {
 
 function onConfirmGeo(geo: IGeo) {
   console.log('geo', geo)
-  form.value.geo = geo
+  addressName.value = geo.address
+  form.value.lnglat = geo.lnglat
   showMapPicker.value = false
 }
 </script>
@@ -47,14 +55,14 @@ function onConfirmGeo(geo: IGeo) {
                 设置
               </q-item-label>
               <q-input v-model="form.name" filled item-aligned placeholder="服务名称" />
-              <q-select v-model="form.subareaName" standout="bg-primary text-white" :options="options" label="服务分区"
+              <q-select v-model="form.subArea" standout="bg-primary text-white" :options="options" label="服务分区"
                 item-aligned />
 
-              <q-input v-model="form.date.from" filled item-aligned unmasked-value mask="####-##-## ##:##">
+              <q-input v-model="form.startDate" filled item-aligned unmasked-value mask="####-##-## ##:##">
                 <template #prepend>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.date.from" mask="YYYY-MM-DD HH:mm">
+                      <q-date v-model="form.startDate" mask="YYYY-MM-DD HH:mm">
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -66,7 +74,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #append>
                   <q-icon name="access_time" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-time v-model="form.date.from" mask="YYYY-MM-DD HH:mm" format24h>
+                      <q-time v-model="form.startDate" mask="YYYY-MM-DD HH:mm" format24h>
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -76,11 +84,11 @@ function onConfirmGeo(geo: IGeo) {
                 </template>
               </q-input>
 
-              <q-input v-model="form.date.to" filled item-aligned unmasked-value mask="####-##-## ##:##">
+              <q-input v-model="form.endDate" filled item-aligned unmasked-value mask="####-##-## ##:##">
                 <template #prepend>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.date.to" mask="YYYY-MM-DD HH:mm">
+                      <q-date v-model="form.endDate" mask="YYYY-MM-DD HH:mm">
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -92,7 +100,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #append>
                   <q-icon name="access_time" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-time v-model="form.date.to" mask="YYYY-MM-DD HH:mm" format24h>
+                      <q-time v-model="form.endDate" mask="YYYY-MM-DD HH:mm" format24h>
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -102,7 +110,7 @@ function onConfirmGeo(geo: IGeo) {
                 </template>
               </q-input>
 
-              <q-input v-model="form.geo.address" filled item-aligned readonly placeholder="设置地理位置" @click="selectMap">
+              <q-input v-model="addressName" filled item-aligned readonly placeholder="设置地理位置" @click="selectMap">
                 <template #append>
                   <q-icon name="place" class="cursor-pointer" />
                 </template>
@@ -119,7 +127,7 @@ function onConfirmGeo(geo: IGeo) {
 
                   <q-page-container>
                     <q-page>
-                      <GeoPicker :source="form.geo.lnglat" @confirm="onConfirmGeo" />
+                      <GeoPicker :source="form.lnglat" @confirm="onConfirmGeo" />
                     </q-page>
                   </q-page-container>
                 </q-layout>

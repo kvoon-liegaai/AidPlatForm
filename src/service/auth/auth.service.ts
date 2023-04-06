@@ -1,7 +1,7 @@
 import { useStorage } from '@vueuse/core'
 import { BehaviorSubject } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { login } from 'src/service/api/adp.api'
+import { login } from './auth.api'
 
 export class AuthService {
   public name = 'authService'
@@ -12,8 +12,10 @@ export class AuthService {
   private constructor() {
     this.loggedIn = new BehaviorSubject(false)
     this.access_token = useStorage('access_token', null)
-    if (this.access_token)
+    if (this.access_token.value)
       this.loggedIn.next(true)
+    else
+      this.loggedIn.next(false)
     console.log('local storage access token: ', this.access_token.value)
   }
 

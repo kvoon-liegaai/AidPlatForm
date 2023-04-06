@@ -8,9 +8,9 @@ import { LoadStatus } from 'src/types/status'
 import { debounceTime, merge, switchMap, tap } from 'rxjs'
 import { fromEvent, toObserver, useSubscription } from '@vueuse/rxjs'
 import { useLocalStorage } from '@vueuse/core'
-import type { IGeo, IQuickMatchSheet } from 'src/types'
-import { defaultQuickMatchSheet } from 'src/types'
 import { regeo2IGeo } from 'src/utils/map'
+import type { IGeo } from 'src/service/map/map.model'
+import { type IQuickMatchSheet, defaultQuickMatchSheet } from 'src/types'
 
 const geoStore = useGeoStore()
 const quickMatchForm = useLocalStorage<IQuickMatchSheet>('quickMatchForm', defaultQuickMatchSheet)
@@ -48,7 +48,7 @@ onMounted(() => {
     }
 
     // center
-    if (!geoStore.error && geoStore.coords.latitude != Infinity && geoStore.coords.longitude != Infinity) {
+    if (!geoStore.error && geoStore.coords.latitude !== Infinity && geoStore.coords.longitude !== Infinity) {
       center = [geoStore.coords.longitude, geoStore.coords.latitude]
     }
     else {
@@ -137,10 +137,7 @@ onUnmounted(() => {
       <q-page-container>
         <q-page relative>
           <div id="map-container" />
-          <PinMarkerVue
-            id="pin" :location="cardInfo.address" theme-color="primary"
-            :status="pinStatus"
-          />
+          <PinMarkerVue id="pin" :location="cardInfo.address" theme-color="primary" :status="pinStatus" />
           <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
             <q-card-section class="bg-grey-8 text-white">
               <div class="text-h6">
@@ -153,7 +150,7 @@ onUnmounted(() => {
             </q-card-section>
 
             <q-card-actions vertical align="center" @click="onConfirm">
-              <q-btn flat w-full font-bold :disable="pinStatus != LoadStatus.PREPARED">
+              <q-btn flat w-full font-bold :disable="pinStatus !== LoadStatus.PREPARED">
                 确认
               </q-btn>
             </q-card-actions>

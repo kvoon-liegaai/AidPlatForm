@@ -1,14 +1,6 @@
 import { useDefaultCoords } from 'src/composition/geo'
-
-interface IGeo {
-  address: string
-  fullAddress: string
-  lnglat: {
-    longitude: number
-    latitude: number
-  }
-  regeocode: any
-}
+import type { IGeo } from 'src/service/map/map.model'
+import type { CreateHelpResourceParams } from 'src/service/resource/resource.model'
 
 type IQuickMatchSheet = Pick<
   ProvideServiceParams,
@@ -29,21 +21,14 @@ interface ProvideServiceParams {
   geo: IGeo
 }
 
-const defaultProvideService = {
+const defaultProvideService: CreateHelpResourceParams = {
   name: '',
+  userId: 0,
   subscribe: '',
-
-  subareaName: '',
-  date: {
-    from: '2019-02-22 21:02',
-    to: '2019-02-22 21:02',
-  },
-  geo: {
-    address: '',
-    fullAddress: '',
-    lnglat: useDefaultCoords('object'),
-    regeocode: {},
-  },
+  subArea: '',
+  startDate: '2019-02-22 21:02',
+  endDate: '2019-02-22 21:02',
+  lnglat: useDefaultCoords('object'),
 }
 
 const defaultQuickMatchSheet = {
@@ -61,7 +46,6 @@ const defaultQuickMatchSheet = {
 }
 
 export type {
-  IGeo,
   IQuickMatchSheet,
   ProvideServiceParams,
 }
