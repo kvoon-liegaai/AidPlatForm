@@ -79,6 +79,7 @@ module.exports = {
     'vue/first-attribute-linebreak': 'off',
     'vue/html-indent': 'off',
     'vue/html-closing-bracket-newline': 'off',
+    'eslint-comments/no-unlimited-disable': 'off',
 
     quotes: ['warn', 'single', { avoidEscape: true }],
 

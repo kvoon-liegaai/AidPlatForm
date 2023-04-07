@@ -28,7 +28,7 @@ const defaultProvideService: CreateHelpResourceParams = {
   subArea: '',
   startDate: '2019-02-22 21:02',
   endDate: '2019-02-22 21:02',
-  lnglat: useDefaultCoords('object'),
+  location: useDefaultCoords('object'),
 }
 
 const defaultQuickMatchSheet = {

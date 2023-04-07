@@ -35,7 +35,7 @@ function selectMap() {
 function onConfirmGeo(geo: IGeo) {
   console.log('geo', geo)
   addressName.value = geo.address
-  form.value.lnglat = geo.lnglat
+  form.value.location = geo.lnglat
   showMapPicker.value = false
 }
 </script>
@@ -127,7 +127,7 @@ function onConfirmGeo(geo: IGeo) {
 
                   <q-page-container>
                     <q-page>
-                      <GeoPicker :source="form.lnglat" @confirm="onConfirmGeo" />
+                      <GeoPicker :source="form.location" @confirm="onConfirmGeo" />
                     </q-page>
                   </q-page-container>
                 </q-layout>

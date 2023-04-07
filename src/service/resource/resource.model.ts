@@ -7,5 +7,5 @@ export interface CreateHelpResourceParams {
   subArea: string
   startDate: string
   endDate: string
-  lnglat: Location
+  location: Location
 }
