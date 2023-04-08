@@ -18,7 +18,7 @@ function provideService() {
   setTimeout(() => {
     isLoading.value = false
   }, 3000)
-  console.log('sq')
+  console.log(form.value)
 }
 
 function selectMap() {
