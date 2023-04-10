@@ -1,5 +1,6 @@
 <script setup lang='ts'>
-import { AuthService } from 'src/service/auth.service'
+import { AuthService } from 'src/service/auth/auth.service'
+
 const router = useRouter()
 
 const goProvideService = () => {

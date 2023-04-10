@@ -2,48 +2,12 @@ import type { Observable } from 'rxjs'
 import { mergeMap } from 'rxjs'
 import { fromFetch } from 'rxjs/fetch'
 import { ajax } from 'rxjs/ajax'
+import type { LoginResponse, SignUpParams } from './auth.model'
 
 export enum AdpApi {
   login = '/api/auth/login',
   register = '/api/user/register',
 }
-
-export enum Role {
-  Root = 'root',
-  User = 'user',
-  Admin = 'admin',
-}
-
-export interface UserModel {
-  id: number
-  username: string // 用户名
-  nickname: string // 昵称
-  password: string // 密码
-  avatar: string
-  email: string
-  role: Role // 用户角色
-  createTime: Date
-  updateTime: Date
-}
-
-export type LoginParams = Pick<
-  UserModel,
-  'username' |
-  'password'
->
-
-export interface LoginResponse {
-  access_token: string
-}
-
-export type SignUpParams = Pick<
-  UserModel,
-  'username' |
-  'password' |
-  'nickname' |
-  'email' |
-  'role'
->
 
 export function login(username: string, password: string): Observable<LoginResponse> {
   return fromFetch(AdpApi.login, {

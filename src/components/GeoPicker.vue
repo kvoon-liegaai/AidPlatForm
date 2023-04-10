@@ -6,8 +6,8 @@ import PinMarkerVue from 'src/components/PinMarker.vue'
 import { LoadStatus } from 'src/types/status'
 import { debounceTime, merge, tap } from 'rxjs'
 import { fromEvent, toObserver, useSubscription } from '@vueuse/rxjs'
-import type { IGeo } from 'src/types'
 import { GeoService } from 'src/service/geo.service'
+import type { IGeo } from 'src/service/map/map.model'
 
 const props = defineProps<{
   source?: {

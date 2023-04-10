@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useSubscription } from '@vueuse/rxjs'
 import { Notify, QForm } from 'quasar'
-import type { SignUpParams } from 'src/service/api/adp.api'
-import { Role, signUp } from 'src/service/api/adp.api'
-import { AuthService } from 'src/service/auth.service'
+import { signUp } from 'src/service/auth/auth.api'
+import { Role, type SignUpParams } from 'src/service/auth/auth.model'
+import { AuthService } from 'src/service/auth/auth.service'
 
 const router = useRouter()
 const authService = AuthService.getInstance()
@@ -78,6 +78,8 @@ function onSignupSubmit() {
     .subscribe({
       next: (res) => {
         console.log('res', res)
+        Notify.create('账号创建成功')
+        tab.value = 'login'
       },
       error: ({ response }) => {
         console.log('err', response.message)

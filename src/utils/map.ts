@@ -34,10 +34,11 @@
 // }
 
 import { type Observable, of, switchMap } from 'rxjs'
-import { getReGeo } from 'src/service/api/amap.api'
-import type { IGeo } from 'src/types'
+import { getReGeo } from 'src/service/map/map.api'
+import type { IGeo } from 'src/service/map/map.model'
 
-export const lnglat2IGeo = (lnglat: AMap.LngLat): Observable<IGeo> =>
+export const GetIGeoByReGeo = (lnglat: AMap.LngLat): Observable<IGeo> =>
+  // export const regeo2IGeo = (lnglat: AMap.LngLat): Observable<IGeo> =>
   getReGeo(lnglat).pipe(
     switchMap((regeocode) => {
       const res: IGeo = {

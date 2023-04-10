@@ -23,6 +23,8 @@ module.exports = {
   extends: [
     // Base ESLint recommended rules
     'eslint:recommended',
+
+    // antfu eslint
     '@antfu',
 
     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage
@@ -77,6 +79,7 @@ module.exports = {
     'vue/first-attribute-linebreak': 'off',
     'vue/html-indent': 'off',
     'vue/html-closing-bracket-newline': 'off',
+    'eslint-comments/no-unlimited-disable': 'off',
 
     quotes: ['warn', 'single', { avoidEscape: true }],
 
