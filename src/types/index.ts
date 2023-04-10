@@ -1,6 +1,7 @@
 import { useDefaultCoords } from 'src/composition/geo'
 import type { IGeo } from 'src/service/map/map.model'
 import type { CreateHelpResourceParams } from 'src/service/resource/resource.model'
+import { useProfileStore } from 'src/stores/profile.store'
 
 type IQuickMatchSheet = Pick<
   ProvideServiceParams,
@@ -23,12 +24,12 @@ interface ProvideServiceParams {
 
 const defaultProvideService: CreateHelpResourceParams = {
   name: '',
-  userId: 0,
+  userId: useProfileStore().id | 0,
   subscribe: '',
   subArea: '',
   startDate: '2019-02-22 21:02',
   endDate: '2019-02-22 21:02',
-  location: useDefaultCoords('object'),
+  ...useDefaultCoords('object'),
 }
 
 const defaultQuickMatchSheet = {
