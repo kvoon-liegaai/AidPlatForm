@@ -1,7 +1,6 @@
 import { useDefaultCoords } from 'src/composition/geo'
 import type { IGeo } from 'src/service/map/map.model'
 import type { CreateHelpResourceParams } from 'src/service/resource/resource.model'
-import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import { useProfileStore } from 'src/stores/profile.store'
 
 type IQuickMatchSheet = Pick<
@@ -32,7 +31,6 @@ const defaultProvideService: CreateHelpResourceParams = {
   subArea: '',
   startDate: '2019-02-22 21:02',
   endDate: '2019-02-22 21:02',
-  status: HelpResourceStatus.PENDING,
   ...useDefaultCoords('object'),
 }
 

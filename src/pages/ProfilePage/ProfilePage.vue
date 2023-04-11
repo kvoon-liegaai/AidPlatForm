@@ -10,7 +10,7 @@ import { getProvidedResources } from 'src/service/resource/resource.api'
 const profileStore = useProfileStore()
 
 const profile = ref<ProfileModel>(DEFAULT_PROFILE)
-const helpResources = ref<HelpResourceModel[] | null>(null)
+const helpResources = ref<HelpResourceModel[] | []>([])
 
 const ratingModel = ref(4)
 const commentsRecords = ref([
@@ -48,7 +48,7 @@ onMounted(() => {
             {{ profile.nickname }}
             <q-btn label="编辑" icon="edit" size="sm" rounded outline color="primary" />
           </div>
-          <div class="card-group" flex justify-between>
+          <div class="card-group" flex gap-4>
             <div class="card-item bg-[#EBFDFFFF]">
               <div class="card-item__title">
                 评价等级
@@ -83,6 +83,7 @@ onMounted(() => {
         </p>
       </div>
     </div>
+
     <div class="comment-record">
       <div class="title">
         评价记录
@@ -125,19 +126,23 @@ onMounted(() => {
         </div>
       </q-scroll-area>
     </div>
+
     <div class="provided-service">
       <div class="title">
         我的服务
       </div>
+      <div v-if="!helpResources.length" color-bluegray>
+        无
+      </div>
       <div grid grid-cols-2 gap-5>
-        <q-card v-for="n in 4" :key="n" class="my-card">
+        <q-card v-for="hr in helpResources" :key="hr.id" class="my-card">
           <q-img src="https://cdn.quasar.dev/img/parallax2.jpg">
             <div class="absolute-bottom">
               <div class="text-h6" truncate>
-                士大夫但是立刻返回
+                {{ hr.name }}
               </div>
               <div class="text-subtitle2">
-                2012-5-5
+                {{ hr.startDate }}
               </div>
             </div>
           </q-img>
@@ -161,11 +166,11 @@ onMounted(() => {
 }
 
 .title {
-  --at-apply: text-h4 font-bold leading-10
+  --at-apply: text-h4 font-bold leading-10;
 }
 
 .card-item {
-  --at-apply: w-27 h-20 flex flex-col items-center justify-evenly;
+  --at-apply: w-27 h-20 flex flex-col items-center justify-evenly flex-1;
   border-radius: 4px;
 
   .card-item__score {
