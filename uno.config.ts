@@ -1,11 +1,21 @@
 import { defineConfig, presetAttributify, presetUno } from 'unocss'
 import transformerVariantGroup from '@unocss/transformer-variant-group'
+import transformerDirectives from '@unocss/transformer-directives'
+import presetIcons from '@unocss/preset-icons'
 
 export default defineConfig({
   shortcuts: {
     card: 'ring-(coolGray-200 2 solid offset-2) shadow-md',
   },
-  presets: [presetAttributify({}), presetUno()],
+  presets: [
+    presetAttributify({}),
+    presetUno(),
+    presetIcons({
+      collections: {
+        mdi: import('@iconify-json/mdi/icons.json').then(i => i.default),
+      },
+    }),
+  ],
   theme: {
     colors: {
       'white': '#FFFFFF',
@@ -347,5 +357,8 @@ export default defineConfig({
     //   },
     // ],
   ],
-  transformers: [transformerVariantGroup()],
+  transformers: [
+    transformerDirectives(),
+    transformerVariantGroup(),
+  ],
 })

@@ -1,10 +1,6 @@
 import { http } from '../http'
-
-export interface SelfProfileModel {
-  id: number
-  username: string
-}
+import type { ProfileModel, SelfProfileModel } from './user.model'
 
 export const getSelfProfile = () => http.get<SelfProfileModel>('profile')
 
-export const getProfileById = (id: number) => http.get(`user/${id}`)
+export const getProfileById = (id: number) => http.get<ProfileModel>(`user/${id}`)

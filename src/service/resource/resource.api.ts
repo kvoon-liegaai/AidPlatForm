@@ -1,10 +1,14 @@
 import { http } from '../http'
-import type { CreateHelpResourceParams } from './resource.model'
+import type { CreateHelpResourceParams, HelpResourceModel } from './resource.model'
 
 export enum HelpResourceApi {
-  createResource = 'help-resource',
+  HR = 'help-resource',
 }
 
 export const createHelpResource = (params: CreateHelpResourceParams) => {
-  return http.post(HelpResourceApi.createResource, params)
+  return http.post<HelpResourceModel>(HelpResourceApi.HR, params)
+}
+
+export const getProvidedResources = (userId: number) => {
+  return http.get<HelpResourceModel[]>(`${HelpResourceApi.HR}/${userId}`)
 }

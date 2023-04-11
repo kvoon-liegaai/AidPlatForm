@@ -1,10 +1,25 @@
 import type { Location } from '../map/map.model'
 
-export interface CreateHelpResourceParams extends Location {
+export enum HelpResourceStatus {
+  PENDING,
+  FULFILL,
+  CANCELED,
+  ONGOING,
+}
+
+export type CreateHelpResourceParams = Omit<
+  HelpResourceModel,
+  'id' |
+  'status'
+>
+
+export interface HelpResourceModel extends Location {
+  id: number
   userId: number
   name: string
-  subscribe: string
+  describe: string
   subArea: string
   startDate: string
   endDate: string
+  status: HelpResourceStatus
 }

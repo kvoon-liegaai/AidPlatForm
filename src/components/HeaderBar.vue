@@ -22,7 +22,7 @@ const logout = () => {
         </q-avatar>
         <span class="font-smiley">邻里帮帮</span>
       </section>
-      <q-btn color="primary" label="提供服务" icon="add" @click="goProvideService" />
+      <q-btn color="primary" label="提供服务" rounded size="sm" icon="add" @click="goProvideService" />
       <q-btn-dropdown flat label="更多" color="primary">
         <div class="row no-wrap q-pa-md">
           <div class="column items-center">

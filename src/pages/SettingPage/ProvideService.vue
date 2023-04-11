@@ -8,7 +8,7 @@ import { createHelpResource } from 'src/service/resource/resource.api'
 import { useSubscription } from '@vueuse/rxjs'
 import { subAreasName } from '../HomePage/model'
 
-const isLoading = ref(false)
+const isSubmitting = ref(false)
 
 const showMapPicker = ref(false)
 
@@ -21,11 +21,11 @@ const addressName = ref('')
 function provideService() {
   console.log('sq')
   // form.value.geo = JSON.stringify(form.value.geo)
-  isLoading.value = true
+  isSubmitting.value = true
   useSubscription(
     createHelpResource(form.value)
       .subscribe(() => {
-        isLoading.value = false
+        isSubmitting.value = false
       }),
   )
 }
@@ -137,8 +137,9 @@ function onConfirmGeo(geo: IGeo) {
                 </q-layout>
               </q-dialog>
 
-              <q-input v-model="form.subscribe" filled item-aligned type="textarea" placeholder="描述信息" />
-              <q-btn type="submit" :loading="isLoading" class="full-width" filled item-aligned color="primary" label="提交">
+              <q-input v-model="form.describe" filled item-aligned type="textarea" placeholder="描述信息" />
+              <q-btn type="submit" :loading="isSubmitting" class="full-width" filled item-aligned color="primary"
+                label="提交">
                 <template #loading>
                   <q-spinner-hourglass class="on-left" />
                   设置中
