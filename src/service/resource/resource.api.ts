@@ -12,3 +12,7 @@ export const createHelpResource = (params: CreateHelpResourceParams) => {
 export const getProvidedResources = (userId: number) => {
   return http.get<HelpResourceModel[]>(`${HelpResourceApi.HR}/${userId}`)
 }
+
+export const deleteHelpResource = (id: number) => {
+  return http.delete(`${HelpResourceApi.HR}/${id}`)
+}
