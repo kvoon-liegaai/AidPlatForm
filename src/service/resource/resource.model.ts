@@ -19,7 +19,8 @@ export interface HelpResourceModel extends Location {
   name: string
   describe: string
   subArea: string
-  startDate: string
-  endDate: string
+  tag: string
+  start_date: string
+  end_date: string
   status: HelpResourceStatus
 }

@@ -6,7 +6,9 @@ import { useProfileStore } from 'src/stores/profile.store'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { useSubscription } from '@vueuse/rxjs'
 import { getProvidedResources } from 'src/service/resource/resource.api'
+import { useQuasar } from 'quasar'
 
+const $q = useQuasar()
 const profileStore = useProfileStore()
 
 const profile = ref<ProfileModel>(DEFAULT_PROFILE)
@@ -19,6 +21,10 @@ const commentsRecords = ref([
   { id: 0, userId: 0, username: 'peter', date: '2023-12-13', comments: 'asd;lfa;sdfa', rating: 4 },
   { id: 0, userId: 0, username: 'peter', date: '2023-12-13', comments: 'asd;lfa;sdfa', rating: 4 },
 ])
+
+function handleDeleteHR() {
+  console.log('handle delete hr')
+}
 
 onMounted(() => {
   useSubscription(
@@ -142,7 +148,7 @@ onMounted(() => {
                 {{ hr.name }}
               </div>
               <div class="text-subtitle2">
-                {{ hr.startDate }}
+                {{ hr.start_date }}
               </div>
             </div>
           </q-img>
@@ -150,7 +156,7 @@ onMounted(() => {
             <q-btn flat>
               编辑
             </q-btn>
-            <q-btn flat color="negative">
+            <q-btn flat color="negative" @click="handleDeleteHR">
               删除
             </q-btn>
           </q-card-actions>

@@ -29,8 +29,9 @@ const defaultProvideService: CreateHelpResourceParams = {
   userId: profileStore.getId() | 0,
   describe: '',
   subArea: '',
-  startDate: '2019-02-22 21:02',
-  endDate: '2019-02-22 21:02',
+  tag: '',
+  start_date: '2019-02-22 21:02',
+  end_date: '2019-02-22 21:02',
   ...useDefaultCoords('object'),
 }
 
