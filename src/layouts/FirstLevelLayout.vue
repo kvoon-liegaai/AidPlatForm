@@ -9,13 +9,16 @@ import HeaderBar from 'src/components/HeaderBar.vue'
     </q-header>
 
     <q-page-container>
-      <router-view container mx-auto box-border />
+      <q-page padding>
+        <router-view container mx-auto box-border />
+      </q-page>
     </q-page-container>
 
     <q-footer bordered class="bg-white text-coolGray">
-      <q-tabs>
+      <q-tabs outside-arrows mobile-arrows>
         <q-route-tab active-class="text-primary" label="Home" icon="home" to="/home" exact />
-        <q-route-tab active-class="text-primary" label="Appointments" icon="event_note" to="/appointment" exact />
+        <q-route-tab active-class="text-orange" label="provider" icon="event_note" to="/appointment/provider" exact />
+        <q-route-tab active-class="text-primary" label="receiver" icon="event_note" to="/appointment/receiver" exact />
         <q-route-tab active-class="text-primary" label="Inbox" icon="question_answer" to="/inbox" exact />
         <q-route-tab active-class="text-primary" label="Profile" icon="badge" to="/profile" exact />
       </q-tabs>

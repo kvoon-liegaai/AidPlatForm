@@ -3,6 +3,7 @@ import { useMeta } from 'quasar'
 import { useRouteQuery } from '@vueuse/router'
 import { fetchResourceListWithTag } from 'src/service/resource/resource.api'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
+import { JsonViewer } from 'vue3-json-viewer'
 
 const tag = useRouteQuery('tag', '')
 
@@ -21,9 +22,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-for="(item, key) in tagList" :key="key">
-    {{ JSON.stringify(item) }}
-  </div>
+  <JsonViewer :value="tagList" copyable boxed sort theme="dark" />
 </template>
 
 <style lang='scss' scoped></style>

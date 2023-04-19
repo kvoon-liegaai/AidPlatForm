@@ -37,8 +37,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/layouts/FirstLevelLayout.vue'),
     children: [
       {
-        path: '',
-        component: () => import('pages/AppointmentPage/AppointmentPage.vue'),
+        path: 'receiver',
+        component: () => import('src/pages/AppointmentPage/ReceiverAppointPage.vue'),
+      },
+      {
+        path: 'provider',
+        component: () => import('src/pages/AppointmentPage/ProviderAppointPage.vue'),
       },
     ],
   },
