@@ -1,5 +1,5 @@
 import { BehaviorSubject, combineLatest, switchMap } from 'rxjs'
-import { GetIGeoByReGeo } from 'src/utils/map'
+import { getIGeoByLnglat } from 'src/utils/map'
 
 export class GeoService {
   // 注意这个是私有的, 组件不需要关心这个.
@@ -12,7 +12,7 @@ export class GeoService {
   ])
     .pipe(
       switchMap(([lnglat]) => {
-        return GetIGeoByReGeo(lnglat)
+        return getIGeoByLnglat(lnglat)
       }),
     )
 

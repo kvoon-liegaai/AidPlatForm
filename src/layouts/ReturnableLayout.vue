@@ -22,13 +22,15 @@ function onBack() {
           {{ title }}
         </q-toolbar-title>
         <!-- <q-btn flat round dense>
-              <q-icon name="more_vert" />
-            </q-btn> -->
+                        <q-icon name="more_vert" />
+                      </q-btn> -->
       </q-toolbar>
     </q-header>
 
-    <q-page-container h-screen bg-gray-100>
-      <router-view />
+    <q-page-container h-screen>
+      <q-page padding bg-gray-100>
+        <router-view />
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>

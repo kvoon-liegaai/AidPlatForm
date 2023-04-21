@@ -30,6 +30,7 @@
     "coordtransform": "^2.1.2",
     "dotenv": "^16.0.3",
     "mapbox-gl": "^2.13.0",
+    "normalize.css": "^8.0.1",
     "pinia": "^2.0.33",
     "quasar": "^2.11.7",
     "ramda": "^0.28.0",

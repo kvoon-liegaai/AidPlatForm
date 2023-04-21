@@ -15,6 +15,16 @@ export enum HelpResourceStatus {
   DELETE = 5, // 5: 删除
 }
 
+export const status2Name = {
+  // 0 -> 全部
+  [HelpResourceStatus.UNUSED]: '空闲',
+  [HelpResourceStatus.PENDING]: '未开始',
+  [HelpResourceStatus.FULFILL]: '已完成',
+  [HelpResourceStatus.CANCELED]: '已取消',
+  [HelpResourceStatus.ONGOING]: '进行中',
+  [HelpResourceStatus.DELETE]: '已删除',
+}
+
 // export const helpResourceStatus: HelpResourceStatus = {
 //   UNUSED: 0, // 0: 无人使用
 //   PENDING: 1, // 1: 接受、未开始
@@ -40,4 +50,5 @@ export interface HelpResourceModel extends Location {
   start_date: string
   end_date: string
   status: HelpResourceStatus
+  createTime: string
 }
