@@ -1,17 +1,8 @@
 <script setup lang='ts'>
 import { getProviderAppointList } from 'src/service/resource/resource.api'
-import { HelpResourceStatus } from 'src/service/resource/resource.model'
+import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
-
-const status2Name = {
-  [HelpResourceStatus.UNUSED]: '全部', // 0 -> 全部
-  [HelpResourceStatus.PENDING]: '未开始',
-  [HelpResourceStatus.FULFILL]: '已完成',
-  [HelpResourceStatus.CANCELED]: '已取消',
-  [HelpResourceStatus.ONGOING]: '进行中',
-  [HelpResourceStatus.DELETE]: '已删除',
-}
 
 const curTab = ref<HelpResourceStatus>(HelpResourceStatus.UNUSED)
 
@@ -36,8 +27,8 @@ onMounted(() => {
   <div class="q-gutter-y-md">
   <q-tabs v-model="curTab" outside-arrows mobile-arrows narrow-indicator dense align="justify"
     class="text-orange bg-coolGray-1 rounded-4">
-    <q-tab v-for="(tabName, status) in status2Name" :key="status" :name="Number(status)" :label="tabName"
-      :ripple="false" />
+    <q-tab v-for="(tabName, status) in status2Name" :key="status" :name="Number(status)"
+      :label="Number(status) === HelpResourceStatus.UNUSED ? '全部' : tabName" :ripple="false" />
     <!-- <q-tab :ripple="false" name="all" label="全部" />
     <q-tab :ripple="false" name="processing" label="进行中" />
     <q-tab :ripple="false" name="fulfilled" label="已完成" />
@@ -60,31 +51,31 @@ onMounted(() => {
                                                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
                                                   dolore magna aliqua.
                                                                             </div>
-                                                                          </q-card-section>
+                                                                                        </q-card-section>
 
-                                                                          <q-card-section class="col-5 flex flex-center">
-                                                                            <q-img class="rounded-borders" src="https://cdn.quasar.dev/img/parallax2.jpg" />
-                                                                          </q-card-section>
-                                                                        </q-card-section>
+                                                                                        <q-card-section class="col-5 flex flex-center">
+                                                                                          <q-img class="rounded-borders" src="https://cdn.quasar.dev/img/parallax2.jpg" />
+                                                                                        </q-card-section>
+                                                                                      </q-card-section>
 
-                                                                        <q-separator />
+                                                                                      <q-separator />
 
-                                                                                <q-card-actions>
-                                                                                  <q-avatar size="30px">
-                                                                                    <img src="https://cdn.quasar.dev/img/avatar.png">
-                                                                                  </q-avatar>
-                                                                                  <q-btn flat>
-                                                                                    7:30PM
-                                                                                      </q-btn>
-                                                                                      <q-btn flat>
-                                                                                        取消
-                                                                                            </q-btn>
-                                                                                              <q-btn grow-1 color="orange">
-                                                                                                开始
-                                                                                                              </q-btn>
-                                                                                                            </q-card-actions>
-                                                                                                          </q-card>
-                                                                                                        </section> -->
+                                                                                              <q-card-actions>
+                                                                                                <q-avatar size="30px">
+                                                                                                  <img src="https://cdn.quasar.dev/img/avatar.png">
+                                                                                                </q-avatar>
+                                                                                                <q-btn flat>
+                                                                                                  7:30PM
+                                                                                                    </q-btn>
+                                                                                                    <q-btn flat>
+                                                                                                      取消
+                                                                                                          </q-btn>
+                                                                                                            <q-btn grow-1 color="orange">
+                                                                                                              开始
+                                                                                                                            </q-btn>
+                                                                                                                          </q-card-actions>
+                                                                                                                        </q-card>
+                                                                                                                      </section> -->
   </div>
 </template>
 
