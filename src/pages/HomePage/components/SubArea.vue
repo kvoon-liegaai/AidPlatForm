@@ -25,8 +25,8 @@ function toTag(tag: string) {
       </div>
     </div>
     <div v-for="(cardItem, key) in props.subArea.tags" :key="key" class="card " grid grid-cols-4 h-20 rounded-2
-      overflow-hidden mb-4 @click="toTag(cardItem.tag)">
-      <div class="card__icon-box" col-span-1 flex justify-center items-center
+      bg-gradient-to-r from-white to-gray-100 overflow-hidden mb-4 @click="toTag(cardItem.tag)">
+      <div class="card__icon-box" col-span-1 flex justify-center items-center bg-gradient-to-l from-white
         :style="`background-color:${cardItem.icon.background}`">
         <Icon :icon="cardItem.icon.name" :color="cardItem.icon.color" width="50" height="50" />
       </div>

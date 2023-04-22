@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { useMeta } from 'quasar'
+import { Notify, useMeta } from 'quasar'
 import { useRouteQuery } from '@vueuse/router'
 import { fetchResourceListWithTag } from 'src/service/resource/resource.api'
 import { status2Name } from 'src/service/resource/resource.model'
@@ -7,19 +7,33 @@ import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { JsonViewer } from 'vue3-json-viewer'
 import type { ExAddress } from 'src/service/map/map.model'
 import { getIGeoByLnglat } from 'src/utils/map'
+import { useProfileStore } from 'src/stores/profile.store'
+import { useDefaultCoords } from 'src/composition/geo'
+import GeoViewer from 'components/GeoViewer.vue'
 
 interface TagCardModel extends HelpResourceModel, ExAddress {
   expanded: boolean
 }
 
+const profileStore = useProfileStore()
 const tag = useRouteQuery('tag', '')
 
 useMeta({
-  title: '',
-  // title: tag.value,
+  title: tag.value,
 })
 
 const tagList = ref<TagCardModel[]>([])
+const mapViewerState = reactive({
+  isShowMapViewer: false,
+  location: useDefaultCoords('object'),
+})
+
+function showMapViewer(item: TagCardModel) {
+  const { longitude, latitude } = item
+  mapViewerState.isShowMapViewer = true
+  mapViewerState.location.longitude = longitude
+  mapViewerState.location.latitude = latitude
+}
 
 // const expanded = ref(false)
 // const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
@@ -32,7 +46,7 @@ function formatDate(dateStr: string) {
   return `${year}-${month}-${day}`
 }
 
-const onExpand = (item: TagCardModel) => {
+function onExpand(item: TagCardModel) {
   if (item.expanded) {
     getIGeoByLnglat(new AMap.LngLat(item.longitude, item.latitude))
       .subscribe((geo) => {
@@ -40,6 +54,16 @@ const onExpand = (item: TagCardModel) => {
         item.fullAddress = geo.fullAddress
       })
   }
+}
+
+const tryRequestHelp = (item: TagCardModel) => {
+  if (Number(item.user?.id) === Number(profileStore.id)) {
+    Notify.create({ position: 'center', message: '你不能对自己提供帮助' })
+    return
+  }
+
+  // TODO: 请求帮助
+  console.log('item', item)
 }
 
 onMounted(() => {
@@ -132,9 +156,13 @@ onMounted(() => {
           <!-- action -->
 
           <q-card-actions>
-            <q-btn flat color="primary" label="Share" />
-            <q-btn flat color="secondary" label="Book" />
-
+            <div>
+              <q-btn-group :rounded="true" spread>
+                <q-btn flat color="primary" label="联系一下" icon="chat" />
+                <q-btn flat color="info" label="查看位置" icon="map" @click="showMapViewer(item)" />
+                <q-btn flat color="pink" label="请求帮助" icon="handshake" @click="tryRequestHelp(item)" />
+              </q-btn-group>
+            </div>
             <q-space />
           </q-card-actions>
 
@@ -148,13 +176,29 @@ onMounted(() => {
               <q-avatar>
                 <img src="https://cdn.quasar.dev/img/avatar5.jpg">
               </q-avatar>
-              John
+              {{ item.user?.username }}
             </q-chip>
           </q-card-section>
         </q-card>
       </div>
     </div>
   </div>
+  <q-dialog v-model="mapViewerState.isShowMapViewer">
+    <q-layout view="Lhh lpR fff" container class="bg-white">
+      <q-header class="bg-primary">
+        <q-toolbar>
+          <q-toolbar-title>地理位置</q-toolbar-title>
+          <q-btn v-close-popup flat round dense icon="close" />
+        </q-toolbar>
+      </q-header>
+
+      <q-page-container>
+        <q-page>
+          <GeoViewer :source="mapViewerState.location" />
+        </q-page>
+      </q-page-container>
+    </q-layout>
+  </q-dialog>
 </template>
 
 <style lang='scss' scoped></style>

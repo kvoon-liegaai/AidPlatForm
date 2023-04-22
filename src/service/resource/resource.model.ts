@@ -1,4 +1,5 @@
-import type { Location } from '../map/map.model'
+import type { ILocation } from '../map/map.model'
+import type { ProfileModel } from '../user/user.model'
 
 // export enum HelpResourceStatus {
 //   PENDING,
@@ -37,12 +38,12 @@ export const status2Name = {
 export type CreateHelpResourceParams = Omit<
   HelpResourceModel,
   'id' |
-  'status'
+  'status' |
+  'createTime'
 >
 
-export interface HelpResourceModel extends Location {
+export interface HelpResourceModel extends ILocation {
   id: number
-  userId: number
   name: string
   describe: string
   subArea: string
@@ -51,4 +52,6 @@ export interface HelpResourceModel extends Location {
   end_date: string
   status: HelpResourceStatus
   createTime: string
+  user?: ProfileModel
+  receiver?: ProfileModel
 }

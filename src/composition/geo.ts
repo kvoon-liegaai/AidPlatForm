@@ -1,9 +1,11 @@
+import type { ILocation } from 'src/service/map/map.model'
+
 /**
  * @param format
  */
 export const useDefaultCoords = <T extends 'array' | 'object'>(
   format: T,
-): T extends 'object' ? { longitude: number; latitude: number } : [number, number] => {
+): T extends 'object' ? ILocation : [number, number] => {
   // const longitude = -74.5;
   // const latitude = 40;
   const longitude = 113.922869

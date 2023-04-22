@@ -3,22 +3,19 @@ import { AuthService } from 'src/service/auth/auth.service'
 import { getSelfProfile } from 'src/service/user/user.api'
 
 export const useProfileStore = defineStore('profile', () => {
-  const profile = ref({
-    id: 0,
-    username: '',
-  })
+  const id = ref(0)
+  const username = ref('')
 
   const updateProfile = () => {
     getSelfProfile().subscribe((p) => {
-      profile.value = p
+      id.value = p.id
+      username.value = p.username
     })
   }
 
   const resetProfile = () => {
-    profile.value = {
-      id: 0,
-      username: '',
-    }
+    id.value = 0
+    username.value = ''
   }
 
   watch(AuthService.getInstance().access_token, (value) => {
@@ -28,11 +25,8 @@ export const useProfileStore = defineStore('profile', () => {
       resetProfile()
   }, { immediate: true })
 
-  const getId = (): number => profile.value.id
-  const getUsername = (): string => profile.value.username
-
   return {
-    getId,
-    getUsername,
+    id,
+    username,
   }
 })

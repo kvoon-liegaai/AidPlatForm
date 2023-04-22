@@ -2,8 +2,9 @@
 import { useLocalStorage } from '@vueuse/core'
 import BackBar from 'src/components/BackBar.vue'
 import GeoPicker from 'src/components/GeoPicker.vue'
-import type { IGeo, IQuickMatchSheet } from 'src/types'
+import type { IQuickMatchSheet } from 'src/types'
 import { defaultQuickMatchSheet } from 'src/types'
+import type { IGeo } from 'src/service/map/map.model'
 import { subAreasName } from '../HomePage/model'
 
 const showMapPicker = ref(false)
@@ -41,10 +42,8 @@ function onConfirmGeo(geo: IGeo) {
               <q-item-label header>
                 设置
               </q-item-label>
-              <q-select
-                v-model="form.subareaName" standout="bg-primary text-white" :options="options" label="服务分区"
-                item-aligned
-              />
+              <q-select v-model="form.subareaName" standout="bg-primary text-white" :options="options" label="服务分区"
+                item-aligned />
 
               <q-input v-model="form.date.from" filled item-aligned unmasked-value mask="####-##-## ##:##">
                 <template #prepend>

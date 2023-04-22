@@ -1,4 +1,4 @@
-export interface Location {
+export interface ILocation {
   longitude: number
   latitude: number
 }
@@ -70,6 +70,6 @@ export interface ExAddress {
 }
 
 export interface IGeo extends ExAddress {
-  lnglat: Location
+  lnglat: ILocation
   regeocode: Regeocode | object
 }
