@@ -123,16 +123,23 @@ function onSignupSubmit() {
       <!-- 注册 -->
       <QForm v-if="tab === 'signup'" ref="signupFormRef" class="q-gutter-md" @submit="onSignupSubmit"
         @reset="onFormReset(signupFormRef)">
-        <q-input v-model="signupForm.username" outlined label="用户名 *" hint="用户名" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入用户名']" />
+        <q-input v-model="signupForm.username" outlined label="用户名 *" hint="用户名" lazy-rules :rules="
+          [val => val && val.length > 0 || '请输入用户名']
+        " />
         <q-input v-model="signupForm.nickname" outlined label="昵称 *" hint="昵称" lazy-rules
           :rules="[val => val && val.length > 0 || '请输入昵称']" />
 
-        <q-input v-model="signupForm.email" outlined label="邮箱 *" hint="邮箱" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入邮箱']" />
+        <q-input v-model="signupForm.email" outlined label="邮箱 *" hint="邮箱" lazy-rules :rules="
+          [
+            val => val && val.length > 0 || '请输入邮箱',
+            val => /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(val) || '无效的电子邮件地址',
+          ]
+        " />
 
-        <q-input v-model="signupForm.password" type="password" outlined label="密码 *" hint="密码" lazy-rules
-          :rules="[val => val && val.length > 0 || '请输入密码']" />
+        <q-input v-model="signupForm.password" type="password" outlined label="密码 *" hint="密码" lazy-rules :rules="[
+          val => val && val.length > 0 || '请输入密码',
+          val => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(val) || '密码必须包含至少一个大写字母、一个小写字母、一个数字和一个特殊字符，且长度至少为8个字符',
+        ]" />
 
         <q-input v-model="signupForm.password2" type="password" outlined label="确认密码 *" hint="密码" lazy-rules :rules="[
           val => val && val.length > 0 || '请再次输入密码',

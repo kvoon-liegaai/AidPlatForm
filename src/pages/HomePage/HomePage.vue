@@ -8,7 +8,7 @@ const shortcuts = [
   {
     title: '咨询社区',
     imgSrc: '/src/assets/img/callcomu.jpg',
-    bg: 'bg-primary-100',
+    bg: 'bg-gradient-to-r from-green-400 to-blue-500',
     btn: {
       label: '立即咨询',
       bg: 'primary',
@@ -19,7 +19,7 @@ const shortcuts = [
   {
     title: '快速匹配',
     imgSrc: '/src/assets/img/quick_match.jpg',
-    bg: 'bg-red-100',
+    bg: 'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500',
     btn: {
       label: '快速匹配',
       bg: 'red',
@@ -64,7 +64,8 @@ function quickMatch() {
         <q-img :src="shortcut.imgSrc" :ratio="3 / 4" h-20 />
       </div>
       <div class="shortcut__panel" :class="shortcut.bg" col-span-3 flex justify-between px-2 items-center>
-        <div class="shortcut__panel__title text-[#00454FFF] font-bold text-xl">
+        <div class="shortcut__panel__title text-white font-bold text-xl">
+          <!-- <div class="shortcut__panel__title text-[#00454FFF] font-bold text-xl"> -->
           {{ shortcut.title }}
         </div>
         <div class="shortcut__panel__btn">

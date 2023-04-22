@@ -16,11 +16,13 @@ function toTag(tag: string) {
 
 <template>
   <section class="subarea">
-    <div class="title" text-xl font-bold>
-      {{ props.subArea.name }}
-    </div>
-    <div class="subtitle text-(sm coolGray)" leading-loose>
-      {{ props.subArea.subtitle }}
+    <div my-5>
+      <div class="title" text-xl font-bold>
+        {{ props.subArea.name }}
+      </div>
+      <div class="subtitle text-(sm coolGray)" leading-loose>
+        {{ props.subArea.subtitle }}
+      </div>
     </div>
     <div v-for="(cardItem, key) in props.subArea.tags" :key="key" class="card " grid grid-cols-4 h-20 rounded-2
       overflow-hidden mb-4 @click="toTag(cardItem.tag)">
@@ -32,7 +34,7 @@ function toTag(tag: string) {
         <div class="card__info__title" text-black font-bold>
           {{ cardItem.tag }}
         </div>
-        <div class="card__info__desc" text-coolGray>
+        <div class="card__info__desc" text-coolGray-400>
           {{ cardItem.desc }}
         </div>
       </div>
@@ -40,4 +42,6 @@ function toTag(tag: string) {
   </section>
 </template>
 
-<style lang='scss' scoped></style>
+<style lang='scss' scoped>
+.card {}
+</style>
