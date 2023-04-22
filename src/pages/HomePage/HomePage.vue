@@ -57,13 +57,6 @@ function quickMatch() {
 </script>
 
 <template>
-  <!-- <q-toolbar class=" bg-white">
-            <q-toolbar-title>
-              服务列表
-            </q-toolbar-title>
-            <q-btn flat round dense icon="more_vert" />
-          </q-toolbar> -->
-  <!-- <q-bar dark class="bg-primary text-white"> -->
   <q-page padding class="homepage">
     <div v-for="(shortcut, key) in shortcuts" :key="key" class="shortcut shadow-md" grid grid-cols-4 mb-4 rounded-2
       overflow-hidden h-20>

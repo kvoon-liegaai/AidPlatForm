@@ -64,9 +64,12 @@ export interface Regeocode {
   pois: Poi[]
 }
 
-export interface IGeo {
+export interface ExAddress {
   address: string
   fullAddress: string
+}
+
+export interface IGeo extends ExAddress {
   lnglat: Location
   regeocode: Regeocode | object
 }

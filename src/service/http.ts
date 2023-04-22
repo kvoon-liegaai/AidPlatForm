@@ -1,6 +1,6 @@
 import type { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@ngify/http'
 import { HttpClient, HttpEventType } from '@ngify/http'
-import { useLocalStorage } from '@vueuse/core'
+import { isString, useLocalStorage } from '@vueuse/core'
 import { Notify } from 'quasar'
 import { EMPTY, catchError, tap } from 'rxjs'
 import type { Observable } from 'rxjs'
@@ -36,18 +36,24 @@ export const http = new HttpClient([
             console.log('拦截后的响应', response)
         }),
         catchError((err: HttpErrorResponse) => {
-          if (!err.ok) {
+          if (!err.ok)
             console.error('err.statusText', err.statusText)
-            Notify.create({ type: 'negative', position: 'center', message: err.statusText })
-          }
+
           const { error } = err
           console.log('http 订阅的错误响应 err', err)
-          if (error.statusCode === 401 && error.message === 'Unauthorized')
+
+          // 未授权
+          if (error.statusCode === 401 && error.message === 'Unauthorized') {
             AuthService.getInstance().logout()
+            Notify.create({ position: 'center', message: '登录状态已过期' })
+            // return EMPTY
+          }
+
           if (error.statusCode > 299 || error.statusCode < 200) {
             console.log('error.message', error.message)
-            Notify.create({ position: 'center', message: error.message[0] })
+            Notify.create({ position: 'center', message: isString(error.message) ? error.message : error.message[0] })
           }
+
           return EMPTY
         }),
       )

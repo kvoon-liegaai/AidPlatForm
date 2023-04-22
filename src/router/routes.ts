@@ -14,11 +14,21 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/home',
-    component: () => import('src/layouts/FirstLevelLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/HomePage/HomePage.vue'),
+        component: () => import('src/layouts/FirstLevelLayout.vue'),
+        children: [
+          { path: '', component: () => import('pages/HomePage/HomePage.vue') },
+        ],
+      },
+      {
+        path: 'tag-list',
+        component: () => import('src/layouts/ReturnableLayout.vue'),
+        children: [{
+          path: '',
+          component: () => import('pages/HomePage/components/TagList/TagList.vue'),
+        }],
       },
     ],
   },
@@ -27,8 +37,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/layouts/FirstLevelLayout.vue'),
     children: [
       {
-        path: '',
-        component: () => import('pages/AppointmentPage/AppointmentPage.vue'),
+        path: 'receiver',
+        component: () => import('src/pages/AppointmentPage/ReceiverAppointPage.vue'),
+      },
+      {
+        path: 'provider',
+        component: () => import('src/pages/AppointmentPage/ProviderAppointPage.vue'),
       },
     ],
   },
