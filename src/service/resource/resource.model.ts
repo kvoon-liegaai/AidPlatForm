@@ -52,6 +52,6 @@ export interface HelpResourceModel extends ILocation {
   end_date: string
   status: HelpResourceStatus
   createTime: string
-  user?: ProfileModel
+  user: ProfileModel
   receiver?: ProfileModel
 }

@@ -28,12 +28,12 @@ function handleDeleteHR() {
 
 onMounted(() => {
   useSubscription(
-    getProfileById(profileStore.getId())
+    getProfileById(profileStore.id)
       .subscribe(val => profile.value = val),
   )
 
   useSubscription(
-    getProvidedResources(profileStore.getId())
+    getProvidedResources(profileStore.id)
       .subscribe(val => helpResources.value = val),
   )
 })

@@ -10,6 +10,9 @@ import { getIGeoByLnglat } from 'src/utils/map'
 import { useProfileStore } from 'src/stores/profile.store'
 import { useDefaultCoords } from 'src/composition/geo'
 import GeoViewer from 'components/GeoViewer.vue'
+import { io } from 'socket.io-client'
+import type { WsRes } from 'src/common/ws'
+import { ReturnCode } from 'src/common/ws'
 
 interface TagCardModel extends HelpResourceModel, ExAddress {
   expanded: boolean
@@ -17,6 +20,23 @@ interface TagCardModel extends HelpResourceModel, ExAddress {
 
 const profileStore = useProfileStore()
 const tag = useRouteQuery('tag', '')
+
+const socket = io(
+  import.meta.env.VITE_WEB_SOCKET,
+  {
+    query: {
+      userId: profileStore.id,
+    },
+  })
+
+// client-side
+socket.on('connect', () => {
+  console.log('connect', socket.id) // x8WIv7-mJelg7on_ALbx
+})
+
+socket.on('disconnect', () => {
+  console.log('disconnect', socket.id) // undefined
+})
 
 useMeta({
   title: tag.value,
@@ -57,13 +77,40 @@ function onExpand(item: TagCardModel) {
 }
 
 const tryRequestHelp = (item: TagCardModel) => {
-  if (Number(item.user?.id) === Number(profileStore.id)) {
-    Notify.create({ position: 'center', message: '你不能对自己提供帮助' })
+  // if (Number(item.user?.id) === Number(profileStore.id)) {
+  //   Notify.create({ position: 'center', message: '你不能对自己请求帮助' })
+  //   return
+  // }
+
+  if (socket.disconnected) {
+    Notify.create({
+      type: 'negative',
+      message: 'ws: 服务器连接异常',
+    })
+    console.error(socket)
     return
   }
 
-  // TODO: 请求帮助
-  console.log('item', item)
+  const res = socket.emit(
+    'apply-hr',
+    { userId: profileStore.id, providerId: item.user.id },
+    (res: WsRes) => {
+      console.log('res', res)
+      if (res.code === ReturnCode.fail) {
+        Notify.create({
+          message: res.message,
+        })
+      }
+      else if (res.code === ReturnCode.error) {
+        Notify.create({
+          type: 'negative',
+          message: res.message,
+        })
+      }
+      else if (res.code === ReturnCode.success) {
+        Notify.create({ type: 'position', message: res.message })
+      }
+    })
 }
 
 onMounted(() => {
