@@ -8,12 +8,20 @@ export enum HelpResourceApi {
   ReceiverAppoint = 'help-resource/appoint/receiver',
 }
 
+/* create */
+
 export const createHelpResource = (params: CreateHelpResourceParams) => {
   return http.post<HelpResourceModel>(HelpResourceApi.HR, params)
 }
 
+/* get */
+
+export const getHelpResource = (id: number) => {
+  return http.get<HelpResourceModel>(`${HelpResourceApi.HR}/${id}`)
+}
+
 export const getProvidedResources = (userId: number) => {
-  return http.get<HelpResourceModel[]>(`${HelpResourceApi.HR}/${userId}`)
+  return http.get<HelpResourceModel[]>(`${HelpResourceApi.HR}/userId/${userId}`)
 }
 
 export const deleteHelpResource = (id: number) => {
@@ -40,4 +48,14 @@ export const getReceiverAppointList = (status?: HelpResourceStatus) => {
   return status
     ? http.get<HelpResourceModel[]>(`${HelpResourceApi.ReceiverAppoint}/${status}`)
     : http.get<HelpResourceModel[]>(`${HelpResourceApi.ReceiverAppoint}`)
+}
+
+/* patch */
+
+interface AddReceiverParams {
+  helpResourceId: number
+  receiverId: number
+}
+export const addReceiver = (params: AddReceiverParams) => {
+  return http.patch<HelpResourceModel>(`${HelpResourceApi.HR}/${params.helpResourceId}/receiver/${params.receiverId}`)
 }

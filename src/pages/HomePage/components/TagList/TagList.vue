@@ -1,7 +1,7 @@
 <script setup lang='ts'>
-import { Notify, useMeta } from 'quasar'
+import { Dialog, Notify, useMeta } from 'quasar'
 import { useRouteQuery } from '@vueuse/router'
-import { fetchResourceListWithTag } from 'src/service/resource/resource.api'
+import { addReceiver, fetchResourceListWithTag, getHelpResource } from 'src/service/resource/resource.api'
 import { status2Name } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { JsonViewer } from 'vue3-json-viewer'
@@ -13,6 +13,10 @@ import GeoViewer from 'components/GeoViewer.vue'
 import { io } from 'socket.io-client'
 import type { WsRes } from 'src/common/ws'
 import { ReturnCode } from 'src/common/ws'
+import { getProfileById } from 'src/service/user/user.api'
+import { zip } from 'rxjs'
+import { useSubscription } from '@vueuse/rxjs'
+import type { ProfileModel } from 'src/service/user/user.model'
 
 interface TagCardModel extends HelpResourceModel, ExAddress {
   expanded: boolean
@@ -38,6 +42,48 @@ socket.on('disconnect', () => {
   console.log('disconnect', socket.id) // undefined
 })
 
+// watch ws event
+socket.on('apply-hr', ({ userId, helpResourceId }: { userId: number; helpResourceId: number }) => {
+  console.log('userId', userId)
+  const applyHrInfo$ = zip(
+    getProfileById(userId),
+    getHelpResource(helpResourceId),
+  )
+  const onNotifyIgnore = () => { /* ... */ }
+  const onNotifyConfirm = ({ profile, helpResource }: { profile: ProfileModel; helpResource: HelpResourceModel }) => {
+    Dialog.create({
+      title: '互助请求',
+      message: ` 昵称：${profile.nickname} 互助资源：${helpResource.name} `,
+    })
+      .onOk(() => {
+        addReceiver({
+          helpResourceId,
+          receiverId: userId,
+        })
+          .subscribe(console.log)
+      })
+  }
+
+  useSubscription(
+    applyHrInfo$.subscribe(([profile, helpResource]) => {
+      Notify.create({
+        message: '您有新的互助请求',
+        color: 'info',
+        icon: 'outgoing_mail',
+        // TODO: setting avatar
+        // avatar: profile.avatar ? profile.avatar : 'https://cdn.quasar.dev/img/avatar2.jpg',
+        multiLine: true,
+        position: 'top',
+        actions: [
+          { label: '忽略', color: 'yellow', handler: onNotifyIgnore },
+          { label: '查看', color: 'white', handler: onNotifyConfirm.bind(null, { profile, helpResource }) },
+        ],
+        timeout: 0,
+      })
+    }),
+  )
+})
+
 useMeta({
   title: tag.value,
 })
@@ -54,9 +100,6 @@ function showMapViewer(item: TagCardModel) {
   mapViewerState.location.longitude = longitude
   mapViewerState.location.latitude = latitude
 }
-
-// const expanded = ref(false)
-// const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr)
@@ -93,7 +136,7 @@ const tryRequestHelp = (item: TagCardModel) => {
 
   const res = socket.emit(
     'apply-hr',
-    { userId: profileStore.id, providerId: item.user.id },
+    { userId: profileStore.id, providerId: item.user.id, helpResourceId: item.id },
     (res: WsRes) => {
       console.log('res', res)
       if (res.code === ReturnCode.fail) {
@@ -109,6 +152,9 @@ const tryRequestHelp = (item: TagCardModel) => {
       }
       else if (res.code === ReturnCode.success) {
         Notify.create({ type: 'position', message: res.message })
+      }
+      else {
+        console.log(res)
       }
     })
 }
@@ -144,8 +190,9 @@ onMounted(() => {
               {{ formatDate(item.createTime) }}
             </div>
             <div>
+              <!-- TODO: 补全颜色 -->
               <span v-if="item.status === 0" class="text-red-500">{{ status2Name[item.status] }}</span> <span v-else
-                class="text-green-500">Fulfilled</span>
+                class="text-green-500">{{ status2Name[item.status] }}</span>
             </div>
           </q-card-section>
 
@@ -219,12 +266,20 @@ onMounted(() => {
             <div class="text-gray-500">
               {{ item.tag }}
             </div>
-            <q-chip>
-              <q-avatar>
-                <img src="https://cdn.quasar.dev/img/avatar5.jpg">
-              </q-avatar>
-              {{ item.user?.username }}
-            </q-chip>
+            <div>
+              <q-chip v-if="item.receiver">
+                <q-avatar>
+                  <img src="https://cdn.quasar.dev/img/avatar4.jpg">
+                </q-avatar>
+                {{ item.receiver?.username }}
+              </q-chip>
+              <q-chip>
+                <q-avatar>
+                  <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+                </q-avatar>
+                {{ item.user?.username }}
+              </q-chip>
+            </div>
           </q-card-section>
         </q-card>
       </div>
