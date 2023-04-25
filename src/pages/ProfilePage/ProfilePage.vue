@@ -5,14 +5,13 @@ import type { ProfileModel } from 'src/service/user/user.model'
 import { useProfileStore } from 'src/stores/profile.store'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { useSubscription } from '@vueuse/rxjs'
-import { getProvidedResources } from 'src/service/resource/resource.api'
-import { useQuasar } from 'quasar'
+import { deleteHelpResource, getProvidedResources } from 'src/service/resource/resource.api'
+import { Dialog, Notify } from 'quasar'
 
-const $q = useQuasar()
 const profileStore = useProfileStore()
 
 const profile = ref<ProfileModel>(DEFAULT_PROFILE)
-const helpResources = ref<HelpResourceModel[] | []>([])
+const helpResourceList = ref<HelpResourceModel[] | []>([])
 
 const ratingModel = ref(4)
 const commentsRecords = ref([
@@ -22,20 +21,43 @@ const commentsRecords = ref([
   { id: 0, userId: 0, username: 'peter', date: '2023-12-13', comments: 'asd;lfa;sdfa', rating: 4 },
 ])
 
-function handleDeleteHR() {
-  console.log('handle delete hr')
-}
-
-onMounted(() => {
+function loadProfile() {
   useSubscription(
     getProfileById(profileStore.id)
       .subscribe(val => profile.value = val),
   )
+}
 
+function loadHelpResourceList() {
   useSubscription(
     getProvidedResources(profileStore.id)
-      .subscribe(val => helpResources.value = val),
+      .subscribe(val => helpResourceList.value = val),
   )
+}
+
+function handleDeleteHR(helpResourceId: number) {
+  console.log('handle delete hr')
+  Dialog.create({
+    title: '删除互助服务',
+    color: 'red',
+    message: '确定要删除掉吗?',
+    ok: '确定',
+    cancel: '取消',
+    persistent: true,
+  }).onOk(() => {
+    useSubscription(
+      deleteHelpResource(helpResourceId)
+        .subscribe(() => {
+          Notify.create({ message: '删除成功' })
+          loadHelpResourceList()
+        }),
+    )
+  }).onCancel(() => { /**/ })
+}
+
+onMounted(() => {
+  loadProfile()
+  loadHelpResourceList()
 })
 </script>
 
@@ -137,11 +159,11 @@ onMounted(() => {
       <div class="title">
         我的服务
       </div>
-      <div v-if="!helpResources.length" color-bluegray>
+      <div v-if="!helpResourceList.length" color-bluegray>
         无
       </div>
       <div grid grid-cols-2 gap-5>
-        <q-card v-for="hr in helpResources" :key="hr.id" class="my-card">
+        <q-card v-for="hr in helpResourceList" :key="hr.id" class="my-card">
           <q-img src="https://cdn.quasar.dev/img/parallax2.jpg">
             <div class="absolute-bottom">
               <div class="text-h6" truncate>
@@ -156,7 +178,7 @@ onMounted(() => {
             <q-btn flat>
               编辑
             </q-btn>
-            <q-btn flat color="negative" @click="handleDeleteHR">
+            <q-btn flat color="negative" @click="handleDeleteHR(hr.id)">
               删除
             </q-btn>
           </q-card-actions>

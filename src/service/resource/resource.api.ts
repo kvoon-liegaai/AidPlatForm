@@ -24,10 +24,6 @@ export const getProvidedResources = (userId: number) => {
   return http.get<HelpResourceModel[]>(`${HelpResourceApi.HR}/userId/${userId}`)
 }
 
-export const deleteHelpResource = (id: number) => {
-  return http.delete(`${HelpResourceApi.HR}/${id}`)
-}
-
 // tag
 
 export const fetchResourceListWithTag = (tag: string) => {
@@ -51,11 +47,9 @@ export const getReceiverAppointList = (status?: HelpResourceStatus) => {
 }
 
 /* patch */
+// NOTE: 更新状态通过 websocket emit 'hr-update' 更新
 
-interface AddReceiverParams {
-  helpResourceId: number
-  receiverId: number
-}
-export const addReceiver = (params: AddReceiverParams) => {
-  return http.patch<HelpResourceModel>(`${HelpResourceApi.HR}/${params.helpResourceId}/receiver/${params.receiverId}`)
+/* delete */
+export const deleteHelpResource = (id: number) => {
+  return http.delete(`${HelpResourceApi.HR}/${id}`)
 }

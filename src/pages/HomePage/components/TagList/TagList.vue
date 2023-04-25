@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { Dialog, Notify, useMeta } from 'quasar'
 import { useRouteQuery } from '@vueuse/router'
-import { addReceiver, fetchResourceListWithTag, getHelpResource } from 'src/service/resource/resource.api'
+import { fetchResourceListWithTag, getHelpResource } from 'src/service/resource/resource.api'
 import { status2Name } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { JsonViewer } from 'vue3-json-viewer'
@@ -11,12 +11,13 @@ import { useProfileStore } from 'src/stores/profile.store'
 import { useDefaultCoords } from 'src/composition/geo'
 import GeoViewer from 'components/GeoViewer.vue'
 import { io } from 'socket.io-client'
+import { ReturnCode, helpResourceApplyMsgState } from 'src/common/ws'
 import type { WsRes } from 'src/common/ws'
-import { ReturnCode } from 'src/common/ws'
 import { getProfileById } from 'src/service/user/user.api'
 import { zip } from 'rxjs'
 import { useSubscription } from '@vueuse/rxjs'
 import type { ProfileModel } from 'src/service/user/user.model'
+import { formatDate } from 'src/utils/date'
 
 interface TagCardModel extends HelpResourceModel, ExAddress {
   expanded: boolean
@@ -54,13 +55,22 @@ socket.on('apply-hr', ({ userId, helpResourceId }: { userId: number; helpResourc
     Dialog.create({
       title: '互助请求',
       message: ` 昵称：${profile.nickname} 互助资源：${helpResource.name} `,
+      ok: '同意帮助',
+      cancel: '拒绝',
     })
       .onOk(() => {
-        addReceiver({
+        socket.emit('update-hr', {
           helpResourceId,
-          receiverId: userId,
+          userId,
+          status: helpResourceApplyMsgState.FULFILLED,
         })
-          .subscribe(console.log)
+      })
+      .onCancel(() => {
+        socket.emit('update-hr', {
+          helpResourceId,
+          userId,
+          status: helpResourceApplyMsgState.REJECTED,
+        })
       })
   }
 
@@ -101,14 +111,6 @@ function showMapViewer(item: TagCardModel) {
   mapViewerState.location.latitude = latitude
 }
 
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr)
-  const year = date.getFullYear()
-  const month = (`0${date.getMonth()}1`).slice(-2)
-  const day = (`0${date.getDate()}`).slice(-2)
-  return `${year}-${month}-${day}`
-}
-
 function onExpand(item: TagCardModel) {
   if (item.expanded) {
     getIGeoByLnglat(new AMap.LngLat(item.longitude, item.latitude))
@@ -134,27 +136,32 @@ const tryRequestHelp = (item: TagCardModel) => {
     return
   }
 
-  const res = socket.emit(
+  socket.emit(
     'apply-hr',
     { userId: profileStore.id, providerId: item.user.id, helpResourceId: item.id },
     (res: WsRes) => {
       console.log('res', res)
-      if (res.code === ReturnCode.fail) {
-        Notify.create({
-          message: res.message,
-        })
-      }
-      else if (res.code === ReturnCode.error) {
-        Notify.create({
-          type: 'negative',
-          message: res.message,
-        })
-      }
-      else if (res.code === ReturnCode.success) {
-        Notify.create({ type: 'position', message: res.message })
-      }
-      else {
-        console.log(res)
+      switch (res.code) {
+        case ReturnCode.fail:
+          Notify.create({
+            message: res.message,
+          })
+          break
+        case ReturnCode.error:
+          Notify.create({
+            type: 'negative',
+            message: res.message,
+          })
+          break
+        case ReturnCode.success:
+          Notify.create({
+            type: 'position',
+            message: res.message,
+          })
+          break
+        default:
+          console.log(res)
+          break
       }
     })
 }
