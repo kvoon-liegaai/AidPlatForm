@@ -5,7 +5,8 @@ import presetIcons from '@unocss/preset-icons'
 
 export default defineConfig({
   shortcuts: {
-    card: 'ring-(coolGray-200 2 solid offset-2) shadow-md',
+    'card': 'ring-(coolGray-200 2 solid offset-2) shadow-md',
+    'btn-gray': 'bg-coolgray-100 text-primary',
   },
   presets: [
     presetAttributify({}),

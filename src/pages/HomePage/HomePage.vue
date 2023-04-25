@@ -13,7 +13,7 @@ const shortcuts = [
       label: '立即咨询',
       bg: 'primary',
       icon: '',
-      onClick: () => console.log('立即咨询'),
+      onClick: () => window.location.href = 'tel:18173721406',
     },
   },
   {

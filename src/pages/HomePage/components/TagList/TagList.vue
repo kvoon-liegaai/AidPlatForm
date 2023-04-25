@@ -219,7 +219,7 @@ onMounted(() => {
                   {{ item.name }}
                 </div>
                 <div class="text-gray-500">
-                  {{ `${formatDate(item.start_date)}-${formatDate(item.end_date)}` }}
+                  {{ `${(item.start_date)}-${(item.end_date)}` }}
                 </div>
               </q-item-section>
 

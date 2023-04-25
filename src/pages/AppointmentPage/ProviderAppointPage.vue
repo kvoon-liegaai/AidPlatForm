@@ -1,12 +1,19 @@
 <script setup lang='ts'>
+import { useDefaultCoords } from 'src/composition/geo'
 import { getProviderAppointList } from 'src/service/resource/resource.api'
 import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
+import GeoNav from 'components/GeoNav.vue'
 
 const curTab = ref<HelpResourceStatus>(HelpResourceStatus.UNUSED)
 
 const hrList = ref<HelpResourceModel[]>([])
+
+const mapNavState = reactive({
+  isShowMapNav: false,
+  source: useDefaultCoords('object'),
+})
 
 watch(curTab, (tab) => {
   getProviderAppointList(tab)
@@ -14,6 +21,17 @@ watch(curTab, (tab) => {
       return hrList.value = list
     })
 })
+
+function start() {
+  // TODO: start
+  console.log('start')
+}
+
+function showMapNav(hr: HelpResourceModel) {
+  mapNavState.isShowMapNav = true
+  mapNavState.source.longitude = hr.longitude
+  mapNavState.source.latitude = hr.latitude
+}
 
 onMounted(() => {
   getProviderAppointList()
@@ -25,58 +43,85 @@ onMounted(() => {
 
 <template>
   <div class="q-gutter-y-md">
-  <q-tabs v-model="curTab" outside-arrows mobile-arrows narrow-indicator dense align="justify"
-    class="text-orange bg-coolGray-1 rounded-4">
-    <q-tab v-for="(tabName, status) in status2Name" :key="status" :name="Number(status)"
-      :label="Number(status) === HelpResourceStatus.UNUSED ? '全部' : tabName" :ripple="false" />
-    <!-- <q-tab :ripple="false" name="all" label="全部" />
+    <q-tabs v-model="curTab" outside-arrows mobile-arrows narrow-indicator dense align="justify"
+      class="text-orange bg-coolGray-1 rounded-4">
+      <q-tab v-for="(tabName, status) in status2Name" :key="status" :name="Number(status)"
+        :label="Number(status) === HelpResourceStatus.UNUSED ? '全部' : tabName" :ripple="false" />
+      <!-- <q-tab :ripple="false" name="all" label="全部" />
     <q-tab :ripple="false" name="processing" label="进行中" />
     <q-tab :ripple="false" name="fulfilled" label="已完成" />
       <q-tab :ripple="false" name="canceled" label="已取消" />
                                 <q-tab :ripple="false" name="pending" label="未开始" /> -->
-  </q-tabs>
-  <JsonViewer :value="hrList" copyable sort theme="dark" />
-  <!-- <section class="card-list px-4 relative">
-                                  <q-card class="my-card" flat bordered>
-                                    <q-badge rounded color="green" label="未开始" absolute top-0 right-0 m-2 />
-                                    <q-card-section horizontal>
-                                      <q-card-section class="q-pt-xs">
-                                        <div class="text-overline">
-                                                  3 月 12
-                                                </div>
-                                                <div class="text-h5 q-mt-sm q-mb-xs">
-                                                  早上陪跑
-                                                </div>
-                                                <div class="text-caption text-grey">
-                                                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                                                  dolore magna aliqua.
-                                                                            </div>
-                                                                                        </q-card-section>
+    </q-tabs>
+    <JsonViewer :value="hrList" copyable sort theme="dark" />
+    <section class="card-list px-4 relative">
+      <q-card v-for="(hr, key) in hrList" :key="key" class="my-card">
+        <q-card-section horizontal>
+          <q-card-section>
+            <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
+              <div class="absolute-bottom text-center top-0 b-0" flex flex-col justify-center font-bold align-middle>
+                <div>
+                  {{ Number(hr.start_date.split(' ')[0].split('-')[1]) }} 月
+                </div>
+                <div text-lg>
+                  {{ Number(hr.start_date.split(' ')[0].split('-')[2]) }}
+                </div>
+              </div>
+            </q-img>
+          </q-card-section>
+          <q-card-section grow-1 flex flex-col gap-5>
+            <div>
+              <div flex justify-between text-lg>
+                <span font-bold>
+                  {{ hr.name }}
+                </span>
+                <span>
+                  <q-badge outline color="primary" label="未开始" />
+                </span>
+              </div>
+              <div class="time" color-coolGray>
+                <q-icon name="schedule" />
+                {{ hr.start_date }}
+              </div>
+            </div>
+            <div flex justify-between>
+              <q-avatar size="30px">
+                <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              </q-avatar>
+              <q-btn icon="near_me" btn-gray label="去这里" flat />
+              <!-- <q-chip square color="primary" text-color="white" icon="event">
+              </q-chip> -->
+            </div>
+          </q-card-section>
+        </q-card-section>
+        <q-card-actions>
+          <q-btn grow-1 label="取消" flat btn-gray />
+          <q-btn grow-1 label="开始" flat bg="primary" text-color="white" @click="showMapNav(hr)" />
+        </q-card-actions>
+      </q-card>
+    </section>
+    <q-dialog v-model="mapNavState.isShowMapNav">
+      <q-layout view="Lhh lpR fff" container class="bg-white">
+        <q-header class="bg-primary">
+          <q-toolbar>
+            <q-toolbar-title>地理位置</q-toolbar-title>
+            <q-btn v-close-popup flat round dense icon="close" />
+          </q-toolbar>
+        </q-header>
 
-                                                                                        <q-card-section class="col-5 flex flex-center">
-                                                                                          <q-img class="rounded-borders" src="https://cdn.quasar.dev/img/parallax2.jpg" />
-                                                                                        </q-card-section>
-                                                                                      </q-card-section>
-
-                                                                                      <q-separator />
-
-                                                                                              <q-card-actions>
-                                                                                                <q-avatar size="30px">
-                                                                                                  <img src="https://cdn.quasar.dev/img/avatar.png">
-                                                                                                </q-avatar>
-                                                                                                <q-btn flat>
-                                                                                                  7:30PM
-                                                                                                    </q-btn>
-                                                                                                    <q-btn flat>
-                                                                                                      取消
-                                                                                                          </q-btn>
-                                                                                                            <q-btn grow-1 color="orange">
-                                                                                                              开始
-                                                                                                                            </q-btn>
-                                                                                                                          </q-card-actions>
-                                                                                                                        </q-card>
-                                                                                                                      </section> -->
+        <q-page-container>
+          <q-page>
+            <GeoNav :source="mapNavState.source" @start="start" />
+          </q-page>
+        </q-page-container>
+      </q-layout>
+    </q-dialog>
   </div>
 </template>
 
-<style lang='scss' scoped></style>
+<style lang='scss' scoped>
+.overlapping {
+  border: 2px solid white;
+  position: absolute;
+}
+</style>

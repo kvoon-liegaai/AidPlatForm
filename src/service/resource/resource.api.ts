@@ -42,8 +42,8 @@ export const getProviderAppointList = (status?: HelpResourceStatus) => {
 // all or with status
 export const getReceiverAppointList = (status?: HelpResourceStatus) => {
   return status
-    ? http.get<HelpResourceModel[]>(`${HelpResourceApi.ReceiverAppoint}/${status}`)
-    : http.get<HelpResourceModel[]>(`${HelpResourceApi.ReceiverAppoint}`)
+    ? http.get<HelpResourceModel[]>(`${HelpResourceApi.ReceiverAppoint}/${status}`) // with status
+    : http.get<HelpResourceModel[]>(`${HelpResourceApi.ReceiverAppoint}`) // all
 }
 
 /* patch */
