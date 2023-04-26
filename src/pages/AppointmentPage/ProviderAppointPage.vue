@@ -20,7 +20,7 @@ watch(curTab, (tab) => {
 })
 
 function refresh(done: any) {
-  getProviderAppointList()
+  getProviderAppointList(curTab.value)
     .subscribe((list) => {
       hrList.value = list
       done()
@@ -28,7 +28,7 @@ function refresh(done: any) {
 }
 
 onMounted(() => {
-  getProviderAppointList()
+  getProviderAppointList(curTab.value)
     .subscribe((list) => {
       hrList.value = list
     })
@@ -50,15 +50,9 @@ onMounted(() => {
       </q-tabs>
       <JsonViewer :value="hrList" copyable sort theme="light" />
       <div v-for="(hr, key) in hrList" :key="key" class="card-list">
-        <div v-if="curTab === HelpResourceStatus.PENDING" class="card-wrapper">
-          <PendingCard :hr="hr" />
-        </div>
-        <div v-if="curTab === HelpResourceStatus.ONGOING" class="card-wrapper">
-          <OngoingCard :hr="hr" />
-        </div>
-        <div v-else class="card-wrapper">
-          <PendingCard :hr="hr" />
-        </div>
+        <PendingCard v-if="hr.status === HelpResourceStatus.PENDING" :hr="hr" />
+        <OngoingCard v-if="hr.status === HelpResourceStatus.ONGOING" :hr="hr" />
+        <PendingCard v-else :hr="hr" />
       </div>
     </q-pull-to-refresh>
   </div>
