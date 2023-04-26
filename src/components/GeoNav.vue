@@ -5,14 +5,16 @@ import { useGeoStore } from 'src/stores/geo'
 import { merge, tap } from 'rxjs'
 import { fromEvent, toObserver, useSubscription } from '@vueuse/rxjs'
 import { GeoService } from 'src/service/geo.service'
-import type { IGeo, ILocation } from 'src/service/map/map.model'
+import type { IGeo } from 'src/service/map/map.model'
+import type { MapNavState } from 'src/pages/AppointmentPage/types'
+import { HelpResourceStatus } from 'src/service/resource/resource.model'
 
 const props = defineProps<{
-  source: ILocation
+  state: MapNavState
 }>()
 
 const emits = defineEmits<{
-  (event: 'start'): void
+  (event: 'setHrStatus', status: HelpResourceStatus): void
 }>()
 
 const geoStore = useGeoStore() // self geo location
@@ -35,8 +37,9 @@ const cardInfo = ref<IGeo>({
 })
 
 function start() {
+  console.log('click start btn')
   if (canStart.value)
-    emits('start')
+    emits('setHrStatus', HelpResourceStatus.ONGOING)
   else
     Notify.create('请先到达指定位置')
 }
@@ -67,7 +70,7 @@ onMounted(() => {
     // init center
 
     // center -> source
-    center = [props.source.longitude, props.source.latitude]
+    center = [props.state.source.longitude, props.state.source.latitude]
     console.log('center', center)
 
     // init map
@@ -123,7 +126,7 @@ onMounted(() => {
         // check location
         distance.value = AMap.GeometryUtil.distance(
           [geoStore.coords.longitude, geoStore.coords.latitude],
-          [props.source.longitude, props.source.latitude],
+          [props.state.source.longitude, props.state.source.latitude],
         )
       })
     }
@@ -142,8 +145,10 @@ onUnmounted(() => {
   <section>
     <div id="map-container" />
     <div class="distance-tip" absolute left-0 right-0 top-10 text-center mx-10 bg="coolgray-600" color-white text-xl
-      leading-loose rounded-2 font-bold>
-      {{ `距离目的地${distance.toFixed(1)}米` }}
+      leading-loose rounded-2>
+      距离目的地
+      <span font-bold> {{ ` ${distance.toFixed(1)} ` }}</span>
+      米
     </div>
     <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
       <q-card-section class="bg-grey-8 text-white">

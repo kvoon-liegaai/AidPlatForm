@@ -1,7 +1,7 @@
 <script setup lang='ts'>
-import { Dialog, Notify, useMeta } from 'quasar'
+import { Notify, useMeta } from 'quasar'
 import { useRouteQuery } from '@vueuse/router'
-import { fetchResourceListWithTag, getHelpResource } from 'src/service/resource/resource.api'
+import { fetchResourceListWithTag } from 'src/service/resource/resource.api'
 import { status2Name } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { JsonViewer } from 'vue3-json-viewer'
@@ -10,14 +10,10 @@ import { getIGeoByLnglat } from 'src/utils/map'
 import { useProfileStore } from 'src/stores/profile.store'
 import { useDefaultCoords } from 'src/composition/geo'
 import GeoViewer from 'components/GeoViewer.vue'
-import { io } from 'socket.io-client'
-import { ReturnCode, helpResourceApplyMsgState } from 'src/common/ws'
+import { ReturnCode } from 'src/common/ws'
 import type { WsRes } from 'src/common/ws'
-import { getProfileById } from 'src/service/user/user.api'
-import { zip } from 'rxjs'
-import { useSubscription } from '@vueuse/rxjs'
-import type { ProfileModel } from 'src/service/user/user.model'
 import { formatDate } from 'src/utils/date'
+import { notificationSocket } from 'src/service/websocket/notification'
 
 interface TagCardModel extends HelpResourceModel, ExAddress {
   expanded: boolean
@@ -25,74 +21,6 @@ interface TagCardModel extends HelpResourceModel, ExAddress {
 
 const profileStore = useProfileStore()
 const tag = useRouteQuery('tag', '')
-
-const socket = io(
-  import.meta.env.VITE_WEB_SOCKET,
-  {
-    query: {
-      userId: profileStore.id,
-    },
-  })
-
-// client-side
-socket.on('connect', () => {
-  console.log('connect', socket.id) // x8WIv7-mJelg7on_ALbx
-})
-
-socket.on('disconnect', () => {
-  console.log('disconnect', socket.id) // undefined
-})
-
-// watch ws event
-socket.on('apply-hr', ({ userId, helpResourceId }: { userId: number; helpResourceId: number }) => {
-  console.log('userId', userId)
-  const applyHrInfo$ = zip(
-    getProfileById(userId),
-    getHelpResource(helpResourceId),
-  )
-  const onNotifyIgnore = () => { /* ... */ }
-  const onNotifyConfirm = ({ profile, helpResource }: { profile: ProfileModel; helpResource: HelpResourceModel }) => {
-    Dialog.create({
-      title: '互助请求',
-      message: ` 昵称：${profile.nickname} 互助资源：${helpResource.name} `,
-      ok: '同意帮助',
-      cancel: '拒绝',
-    })
-      .onOk(() => {
-        socket.emit('update-hr', {
-          helpResourceId,
-          userId,
-          status: helpResourceApplyMsgState.FULFILLED,
-        })
-      })
-      .onCancel(() => {
-        socket.emit('update-hr', {
-          helpResourceId,
-          userId,
-          status: helpResourceApplyMsgState.REJECTED,
-        })
-      })
-  }
-
-  useSubscription(
-    applyHrInfo$.subscribe(([profile, helpResource]) => {
-      Notify.create({
-        message: '您有新的互助请求',
-        color: 'info',
-        icon: 'outgoing_mail',
-        // TODO: setting avatar
-        // avatar: profile.avatar ? profile.avatar : 'https://cdn.quasar.dev/img/avatar2.jpg',
-        multiLine: true,
-        position: 'top',
-        actions: [
-          { label: '忽略', color: 'yellow', handler: onNotifyIgnore },
-          { label: '查看', color: 'white', handler: onNotifyConfirm.bind(null, { profile, helpResource }) },
-        ],
-        timeout: 0,
-      })
-    }),
-  )
-})
 
 useMeta({
   title: tag.value,
@@ -127,16 +55,16 @@ const tryRequestHelp = (item: TagCardModel) => {
   //   return
   // }
 
-  if (socket.disconnected) {
+  if (notificationSocket.disconnected) {
     Notify.create({
       type: 'negative',
       message: 'ws: 服务器连接异常',
     })
-    console.error(socket)
+    console.error(notificationSocket)
     return
   }
 
-  socket.emit(
+  notificationSocket.emit(
     'apply-hr',
     { userId: profileStore.id, providerId: item.user.id, helpResourceId: item.id },
     (res: WsRes) => {
@@ -240,7 +168,7 @@ onMounted(() => {
                   {{ item.describe }}
                 </div>
               </q-card-section>
-              <q-card-section>
+              <q-card-section v-if="item.address || item.fullAddress">
                 <div class="text-lg" flex items-center>
                   地理位置
                 </div>
@@ -250,6 +178,11 @@ onMounted(() => {
                 <div class="text-coolgray-400">
                   {{ item.fullAddress }}
                 </div>
+              </q-card-section>
+              <q-card-section v-else>
+                <q-skeleton type="text" class="text-subtitle1" />
+                <q-skeleton type="text" width="50%" class="text-subtitle1" />
+                <q-skeleton type="text" class="text-caption" />
               </q-card-section>
             </q-card>
           </q-expansion-item>

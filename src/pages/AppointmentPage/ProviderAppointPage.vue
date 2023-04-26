@@ -5,14 +5,17 @@ import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.m
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import GeoNav from 'components/GeoNav.vue'
+import { notificationSocket } from 'src/service/websocket/notification'
+import type { MapNavState } from './types'
 
 const curTab = ref<HelpResourceStatus>(HelpResourceStatus.UNUSED)
 
 const hrList = ref<HelpResourceModel[]>([])
 
-const mapNavState = reactive({
+const mapNavState = reactive<MapNavState>({
   isShowMapNav: false,
   source: useDefaultCoords('object'),
+  curHr: hrList.value[0] ? hrList.value[0] : null,
 })
 
 watch(curTab, (tab) => {
@@ -22,15 +25,28 @@ watch(curTab, (tab) => {
     })
 })
 
-function start() {
+function setHrStatus(status: HelpResourceStatus) {
   // TODO: start
   console.log('start')
+  console.log('mapNavState.curHr', mapNavState.curHr)
+  if (!mapNavState.curHr) {
+    console.error('not find mapNavState.cur', mapNavState)
+    return
+  }
+  notificationSocket.emit('update-hr', {
+    helpResourceId: mapNavState.curHr.id,
+    status,
+  })
 }
 
 function showMapNav(hr: HelpResourceModel) {
+  // isshow
   mapNavState.isShowMapNav = true
+  // source
   mapNavState.source.longitude = hr.longitude
   mapNavState.source.latitude = hr.latitude
+  // hr
+  mapNavState.curHr = hr
 }
 
 onMounted(() => {
@@ -48,10 +64,10 @@ onMounted(() => {
       <q-tab v-for="(tabName, status) in status2Name" :key="status" :name="Number(status)"
         :label="Number(status) === HelpResourceStatus.UNUSED ? '全部' : tabName" :ripple="false" />
       <!-- <q-tab :ripple="false" name="all" label="全部" />
-    <q-tab :ripple="false" name="processing" label="进行中" />
-    <q-tab :ripple="false" name="fulfilled" label="已完成" />
-      <q-tab :ripple="false" name="canceled" label="已取消" />
-                                <q-tab :ripple="false" name="pending" label="未开始" /> -->
+                              <q-tab :ripple="false" name="processing" label="进行中" />
+                              <q-tab :ripple="false" name="fulfilled" label="已完成" />
+                                <q-tab :ripple="false" name="canceled" label="已取消" />
+                                                          <q-tab :ripple="false" name="pending" label="未开始" /> -->
     </q-tabs>
     <JsonViewer :value="hrList" copyable sort theme="dark" />
     <section class="card-list px-4 relative">
@@ -76,7 +92,7 @@ onMounted(() => {
                   {{ hr.name }}
                 </span>
                 <span>
-                  <q-badge outline color="primary" label="未开始" />
+                  <q-badge outline color="primary" :label="status2Name[hr.status]" />
                 </span>
               </div>
               <div class="time" color-coolGray>
@@ -90,7 +106,7 @@ onMounted(() => {
               </q-avatar>
               <q-btn icon="near_me" btn-gray label="去这里" flat />
               <!-- <q-chip square color="primary" text-color="white" icon="event">
-              </q-chip> -->
+                                        </q-chip> -->
             </div>
           </q-card-section>
         </q-card-section>
@@ -111,7 +127,7 @@ onMounted(() => {
 
         <q-page-container>
           <q-page>
-            <GeoNav :source="mapNavState.source" @start="start" />
+            <GeoNav :state="mapNavState" @set-hr-status="setHrStatus" />
           </q-page>
         </q-page-container>
       </q-layout>
