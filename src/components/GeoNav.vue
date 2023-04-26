@@ -25,7 +25,7 @@ let mapObj: AMap.Map
 // let pinMarker: AMap.Marker;
 let selfMarker: AMap.Marker
 
-const radius = 150
+const radius = Number(import.meta.env.VITE_MAP_RADIUS)
 const distance = ref(9999)
 const canStart = computed(() => distance.value < radius)
 

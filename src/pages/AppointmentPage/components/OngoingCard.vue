@@ -1,8 +1,8 @@
 <script setup lang='ts'>
 import { useDefaultCoords } from 'src/composition/geo'
-import { status2Name } from 'src/service/resource/resource.model'
+import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
-import type { HelpResourceModel, HelpResourceStatus } from 'src/service/resource/resource.model'
+import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { notificationSocket } from 'src/service/websocket/notification'
 import GeoNav from 'src/components/GeoNav.vue'
 import type { MapNavState } from '../types'
@@ -79,7 +79,14 @@ function showMapNav(hr: HelpResourceModel) {
         </div>
       </q-card-section>
     </q-card-section>
-    <q-card-actions>
+    <q-card-section>
+      <q-linear-progress size="25px" :value="progress" color="accent">
+        <div class="absolute-full flex flex-center">
+          <q-badge color="white" text-color="accent" :label="progressLabel" />
+        </div>
+      </q-linear-progress>
+    </q-card-section>
+    <q-card-actions v-if="hr.status === HelpResourceStatus.PENDING">
       <q-btn grow-1 label="取消" flat btn-gray />
       <q-btn grow-1 label="开始" flat bg="primary" text-color="white" @click="showMapNav(hr)" />
     </q-card-actions>

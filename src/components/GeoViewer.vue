@@ -85,7 +85,7 @@ onMounted(() => {
 
     const circle = new AMap.Circle({
       center, // 圆心
-      radius: 150, // 半径
+      radius: Number(import.meta.env.VITE_MAP_RADIUS), // 半径
       strokeColor: '#FF33FF',
       strokeWeight: 6,
       strokeOpacity: 0.2,
