@@ -3,17 +3,39 @@ import { useDefaultCoords } from 'src/composition/geo'
 import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
-import { notificationSocket } from 'src/service/websocket/notification'
 import GeoNav from 'src/components/GeoNav.vue'
+import { date } from 'quasar'
+import { useTimestamp } from '@vueuse/core'
 import type { MapNavState } from '../types'
+import { setHrStatus, timestamp2MS } from '../utils'
 
 const props = defineProps<{
   hr: HelpResourceModel
 }>()
 
-const progress = ref(0.1)
+const curTimeStamp = useTimestamp({ offset: 0 })
+
+const progress = computed(() => {
+  if (!props.hr.record)
+    return 0
+  console.log('props.hr.record.start_date', typeof props.hr.record.start_date)
+  const end_date = Date.parse(date.extractDate(props.hr.end_date, 'YYYY-MM-DD HH:mm').toDateString())
+  const start_date = Date.parse(props.hr.record.start_date)
+  const now_date = Date.now()
+  console.log('end_date', end_date)
+  console.log('start_date', start_date)
+  const res = (now_date - start_date) / (end_date - start_date)
+  return res < 0 ? 1 : res
+})
+
 const progressLabel = computed(() => {
-  return `${progress}`
+  let timestamp = 0
+  if (props.hr.record)
+    timestamp = curTimeStamp.value - Date.parse(props.hr.record.start_date)
+
+  const { minutes, seconds } = timestamp2MS(timestamp)
+
+  return `已累计进行${minutes}分钟${seconds}秒`
 })
 
 const mapNavState = reactive<MapNavState>({
@@ -21,26 +43,26 @@ const mapNavState = reactive<MapNavState>({
   source: useDefaultCoords('object'),
 })
 
-function setHrStatus(status: HelpResourceStatus) {
-  // TODO: start
-  console.log('start')
-  notificationSocket.emit('update-hr', {
-    helpResourceId: props.hr.id,
-    status,
-  })
-}
-
-function showMapNav(hr: HelpResourceModel) {
-  // isshow
-  mapNavState.isShowMapNav = true
-  // source
-  mapNavState.source.longitude = hr.longitude
-  mapNavState.source.latitude = hr.latitude
+function onFinish() {
+  console.log('onfinish', props.hr)
+  setHrStatus(props.hr, HelpResourceStatus.FULFILL)
 }
 </script>
 
 <template>
   <q-card class="my-card">
+    <q-card-section py-0>
+      <div class="time" color-coolGray flex justify-between leading-loose>
+        <span>
+          <q-icon name="schedule" />
+          {{ hr.start_date }}
+        </span>
+        <span>
+          <q-icon name="schedule" />
+          {{ hr.end_date }}
+        </span>
+      </div>
+    </q-card-section>
     <q-card-section horizontal>
       <q-card-section>
         <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
@@ -64,10 +86,6 @@ function showMapNav(hr: HelpResourceModel) {
               <q-badge outline color="primary" :label="status2Name[hr.status]" />
             </span>
           </div>
-          <div class="time" color-coolGray>
-            <q-icon name="schedule" />
-            {{ hr.start_date }}
-          </div>
         </div>
         <div flex justify-between>
           <q-avatar size="30px">
@@ -75,7 +93,7 @@ function showMapNav(hr: HelpResourceModel) {
           </q-avatar>
           <q-btn icon="near_me" btn-gray label="去这里" flat />
           <!-- <q-chip square color="primary" text-color="white" icon="event">
-                                        </q-chip> -->
+                                                                                                                              </q-chip> -->
         </div>
       </q-card-section>
     </q-card-section>
@@ -86,11 +104,12 @@ function showMapNav(hr: HelpResourceModel) {
         </div>
       </q-linear-progress>
     </q-card-section>
-    <q-card-actions v-if="hr.status === HelpResourceStatus.PENDING">
-      <q-btn grow-1 label="取消" flat btn-gray />
-      <q-btn grow-1 label="开始" flat bg="primary" text-color="white" @click="showMapNav(hr)" />
+    <q-card-actions>
+      <!-- <q-btn grow-1 label="取消" flat btn-gray /> -->
+      <q-btn grow-1 label="完成" flat bg="primary" text-color="white" @click="onFinish" />
     </q-card-actions>
   </q-card>
+
   <q-dialog v-model="mapNavState.isShowMapNav">
     <q-layout view="Lhh lpR fff" container class="bg-white">
       <q-header class="bg-primary">

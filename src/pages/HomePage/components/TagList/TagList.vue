@@ -161,21 +161,21 @@ onMounted(() => {
             </template>
             <q-card>
               <q-card-section>
-                <div class="text-lg">
+                <div class="text-lg text-primary">
                   描述
                 </div>
-                <div>
+                <div break-all>
                   {{ item.describe }}
                 </div>
               </q-card-section>
               <q-card-section v-if="item.address || item.fullAddress">
-                <div class="text-lg" flex items-center>
+                <div class="text-lg text-primary" flex items-center>
                   地理位置
                 </div>
-                <div class="text-md">
+                <div class="text-md" leading-loose>
                   {{ item.address }}
                 </div>
-                <div class="text-coolgray-400">
+                <div class="text-coolgray-400" break-all>
                   {{ item.fullAddress }}
                 </div>
               </q-card-section>
@@ -191,7 +191,7 @@ onMounted(() => {
 
           <q-card-actions>
             <div>
-              <q-btn-group :rounded="true" spread>
+              <q-btn-group :rounded="true" border="1 coolgray-300 solid" flat w-full>
                 <q-btn flat color="primary" label="联系一下" icon="chat" />
                 <q-btn flat color="info" label="查看位置" icon="map" @click="showMapViewer(item)" />
                 <q-btn flat color="pink" label="请求帮助" icon="handshake" @click="tryRequestHelp(item)" />
@@ -202,7 +202,7 @@ onMounted(() => {
 
           <!-- bottom -->
 
-          <q-card-section class="flex items-center justify-between">
+          <q-card-section class="flex items-center justify-between pt-0">
             <div class="text-gray-500">
               {{ item.tag }}
             </div>

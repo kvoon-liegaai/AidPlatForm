@@ -7,14 +7,13 @@ import { fromEvent, toObserver, useSubscription } from '@vueuse/rxjs'
 import { GeoService } from 'src/service/geo.service'
 import type { IGeo } from 'src/service/map/map.model'
 import type { MapNavState } from 'src/pages/AppointmentPage/types'
-import { HelpResourceStatus } from 'src/service/resource/resource.model'
 
 const props = defineProps<{
   state: MapNavState
 }>()
 
 const emits = defineEmits<{
-  (event: 'setHrStatus', status: HelpResourceStatus): void
+  (event: 'onStart'): void
 }>()
 
 const geoStore = useGeoStore() // self geo location
@@ -39,7 +38,7 @@ const cardInfo = ref<IGeo>({
 function start() {
   console.log('click start btn')
   if (canStart.value)
-    emits('setHrStatus', HelpResourceStatus.ONGOING)
+    emits('onStart')
   else
     Notify.create('请先到达指定位置')
 }

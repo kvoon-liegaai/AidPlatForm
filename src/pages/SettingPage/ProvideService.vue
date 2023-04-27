@@ -17,6 +17,22 @@ const options = subAreasName
 
 const form = reactive<CreateHelpResourceParams>(defaultProvideService)
 
+const startDate = ref(form.start_date.split(' ')[0])
+const startTime = ref(form.start_date.split(' ')[1])
+
+const endDate = ref(form.end_date.split(' ')[0])
+const endTime = ref(form.end_date.split(' ')[1])
+
+watchEffect(() => {
+  console.log('-----------------------------------------------------------')
+  console.log(`${startDate.value} ${startTime.value}`)
+  console.log(`${endDate.value} ${endTime.value}`)
+  form.start_date = `${startDate.value} ${startTime.value}`
+  form.end_date = `${endDate.value} ${endTime.value}`
+  console.log('form.start_date', form.start_date)
+  console.log('form.end_date', form.end_date)
+})
+
 const tagOptions = computed(() => getTagsBySubAreaName(form.subArea)?.map(item => item.tag))
 
 const addressName = ref('')
@@ -72,7 +88,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #prepend>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.start_date" mask="YYYY-MM-DD HH:mm">
+                      <q-date v-model="startDate" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -84,7 +100,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #append>
                   <q-icon name="access_time" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-time v-model="form.start_date" mask="YYYY-MM-DD HH:mm" format24h>
+                      <q-time v-model="startTime" mask="HH:mm" format24h>
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -98,7 +114,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #prepend>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.end_date" mask="YYYY-MM-DD HH:mm">
+                      <q-date v-model="endDate" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -110,7 +126,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #append>
                   <q-icon name="access_time" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-time v-model="form.end_date" mask="YYYY-MM-DD HH:mm" format24h>
+                      <q-time v-model="endTime" mask="HH:mm" format24h>
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>

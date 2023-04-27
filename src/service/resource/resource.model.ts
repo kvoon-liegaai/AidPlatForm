@@ -35,12 +35,24 @@ export const status2Name = {
 //   DELETE: 5, // 5: 删除
 // }
 
-export type CreateHelpResourceParams = Omit<
+export type CreateHelpResourceParams = Pick<
   HelpResourceModel,
-  'id' |
-  'status' |
-  'createTime'
+  'longitude' |
+  'latitude' |
+  'name' |
+  'subArea' |
+  'tag' |
+  'start_date' |
+  'end_date' |
+  'describe'
 >
+
+export interface RecordModel {
+  id: number
+  create_date: Date
+  start_date: string
+  end_date: string
+}
 
 export interface HelpResourceModel extends ILocation {
   id: number
@@ -54,4 +66,5 @@ export interface HelpResourceModel extends ILocation {
   createTime: string
   user: ProfileModel
   receiver?: ProfileModel
+  record?: RecordModel
 }
