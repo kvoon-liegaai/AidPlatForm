@@ -3,10 +3,10 @@ import BackBar from 'src/components/BackBar.vue'
 import GeoPicker from 'src/components/GeoPicker.vue'
 import type { IGeo } from 'src/service/map/map.model'
 import type { CreateHelpResourceParams } from 'src/service/resource/resource.model'
-import { defaultProvideService } from 'src/types'
 import { createHelpResource } from 'src/service/resource/resource.api'
 import { useSubscription } from '@vueuse/rxjs'
-import { Notify } from 'quasar'
+import { Notify, date } from 'quasar'
+import { useDefaultCoords } from 'src/composition/geo'
 import { getTagsBySubAreaName, subAreasName } from '../HomePage/model'
 
 const isSubmitting = ref(false)
@@ -15,7 +15,18 @@ const showMapPicker = ref(false)
 
 const options = subAreasName
 
-const form = reactive<CreateHelpResourceParams>(defaultProvideService)
+const form = reactive<CreateHelpResourceParams>({
+  name: '',
+  describe: '',
+  subArea: '',
+  tag: '',
+  // start_date: '2019-02-22 21:02',
+  // end_date: '2019-02-22 21:02',
+  start_date: date.formatDate(Date.now(), 'YYYY-MM-DD HH:mm'),
+  end_date: date.formatDate(Date.now(), 'YYYY-MM-DD HH:mm'),
+  ...useDefaultCoords('object'),
+},
+)
 
 const startDate = ref(form.start_date.split(' ')[0])
 const startTime = ref(form.start_date.split(' ')[1])
@@ -24,9 +35,6 @@ const endDate = ref(form.end_date.split(' ')[0])
 const endTime = ref(form.end_date.split(' ')[1])
 
 watchEffect(() => {
-  console.log('-----------------------------------------------------------')
-  console.log(`${startDate.value} ${startTime.value}`)
-  console.log(`${endDate.value} ${endTime.value}`)
   form.start_date = `${startDate.value} ${startTime.value}`
   form.end_date = `${endDate.value} ${endTime.value}`
   console.log('form.start_date', form.start_date)

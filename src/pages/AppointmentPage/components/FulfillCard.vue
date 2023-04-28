@@ -1,12 +1,13 @@
 <script setup lang='ts'>
 import { useDefaultCoords } from 'src/composition/geo'
-import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
+import { status2Name } from 'src/service/resource/resource.model'
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import GeoNav from 'src/components/GeoNav.vue'
 import { date } from 'quasar'
 import type { MapNavState } from '../types'
 import { setHrStatus, timestamp2MS } from '../utils'
+import EvaluateForm from './evaluateForm.vue'
 
 const props = defineProps<{
   hr: HelpResourceModel
@@ -40,9 +41,14 @@ const mapNavState = reactive<MapNavState>({
   source: useDefaultCoords('object'),
 })
 
-function onFinish() {
-  console.log('onfinish', props.hr)
-  setHrStatus(props.hr, HelpResourceStatus.FULFILL)
+const evaluateCardState = reactive({
+  isShow: false,
+})
+
+function onEvaluate() {
+  console.log('onEvaluate', props.hr)
+  evaluateCardState.isShow = true
+  // setHrStatus(props.hr, HelpResourceStatus.FULFILL)
 }
 </script>
 
@@ -90,7 +96,7 @@ function onFinish() {
           </q-avatar>
           <q-btn icon="near_me" btn-gray label="去这里" flat />
           <!-- <q-chip square color="primary" text-color="white" icon="event">
-                                                                                                                                  </q-chip> -->
+                                                                                                                                                                                                                                                                                                                                                                                    </q-chip> -->
         </div>
       </q-card-section>
     </q-card-section>
@@ -103,7 +109,8 @@ function onFinish() {
     </q-card-section>
     <q-card-actions>
       <!-- <q-btn grow-1 label="取消" flat btn-gray /> -->
-      <q-btn grow-1 label="完成" flat bg="primary" text-color="white" @click="onFinish" />
+      <q-btn grow-1 :label="props.hr.evaluations ? '查看评价' : '评价'" :disable="!!props.hr.evaluations" flat bg="primary"
+        text-color="white" @click="onEvaluate" />
     </q-card-actions>
   </q-card>
 
@@ -119,6 +126,23 @@ function onFinish() {
       <q-page-container>
         <q-page>
           <GeoNav :state="mapNavState" @set-hr-status="setHrStatus" />
+        </q-page>
+      </q-page-container>
+    </q-layout>
+  </q-dialog>
+
+  <q-dialog v-model="evaluateCardState.isShow">
+    <q-layout view="Lhh lpR fff" container class="bg-white">
+      <q-header class="bg-primary">
+        <q-toolbar>
+          <q-toolbar-title>评价</q-toolbar-title>
+          <q-btn v-close-popup flat round dense icon="close" />
+        </q-toolbar>
+      </q-header>
+
+      <q-page-container>
+        <q-page padding bg-coolgray-100>
+          <EvaluateForm :hr-id="props.hr.id" />
         </q-page>
       </q-page-container>
     </q-layout>

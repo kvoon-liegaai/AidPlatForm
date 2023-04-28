@@ -1,4 +1,4 @@
-import { Notify } from 'quasar'
+import { AddressbarColor, Notify } from 'quasar'
 import { boot } from 'quasar/wrappers'
 import { useGeoStore } from 'src/stores/geo'
 import { useProfileStore } from 'src/stores/profile.store'
@@ -8,11 +8,13 @@ import 'vue3-json-viewer/dist/index.css'
 useGeoStore()
 useProfileStore()
 
-Notify.setDefaults({
-  position: 'center',
-  timeout: 500,
-})
-
 export default boot(({ app }) => {
   app.use(JsonViewer)
+
+  Notify.setDefaults({
+    position: 'center',
+    timeout: 500,
+  })
+
+  AddressbarColor.set('#00bdd6')
 })

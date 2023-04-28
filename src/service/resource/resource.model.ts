@@ -1,3 +1,4 @@
+import type { EvaluationModel } from '../evaluation/evaluation.model'
 import type { ILocation } from '../map/map.model'
 import type { ProfileModel } from '../user/user.model'
 
@@ -67,4 +68,5 @@ export interface HelpResourceModel extends ILocation {
   user: ProfileModel
   receiver?: ProfileModel
   record?: RecordModel
+  evaluations: EvaluationModel[]
 }
