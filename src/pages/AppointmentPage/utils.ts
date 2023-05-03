@@ -32,3 +32,11 @@ export const timestamp2MS = (timestamp: number) =>
   timestamp
     ? { minutes: Math.floor(timestamp / 60000), seconds: ((timestamp % 60000) / 1000).toFixed(0) }
     : { minutes: 0, seconds: 0 }
+
+export const ratingScore2Meaning = {
+  5: { emoji: 'sentiment_very_satisfied', meaning: '非常好' },
+  4: { emoji: 'sentiment_satisfied', meaning: '好' },
+  3: { emoji: 'sentiment_neutral', meaning: '一般' },
+  2: { emoji: 'sentiment_dissatisfied', meaning: '差' },
+  1: { emoji: 'sentiment_very_dissatisfied', meaning: '非常差' },
+}

@@ -12,7 +12,7 @@ import type { ProfileModel } from '../user/user.model'
 const profileStore = useProfileStore()
 
 const notificationSocket = io(
-  import.meta.env.VITE_WEB_SOCKET,
+  import.meta.env.VITE_NOTIFICATION_WEB_SOCKET,
   {
     query: {
       userId: profileStore.id,

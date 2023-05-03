@@ -1,3 +1,4 @@
+import type { UserModel } from '../auth/auth.model'
 import type { HelpResourceModel } from '../resource/resource.model'
 
 export interface CreateEvaluationParams {
@@ -10,8 +11,9 @@ export interface CreateEvaluationParams {
 export interface EvaluationModel {
   id: number
 
-  briefs: string[]
+  briefs: string
   description: string
   ratingScore: 1 | 2 | 3 | 4 | 5
   hr: HelpResourceModel
+  user: UserModel
 }

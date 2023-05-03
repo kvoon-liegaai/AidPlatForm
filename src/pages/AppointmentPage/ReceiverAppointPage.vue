@@ -1,56 +1,58 @@
 <script setup lang='ts'>
-const tab = ref('all')
+import { getReceiverAppointList } from 'src/service/resource/resource.api'
+import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
+// import { HelpResourceStatus } from 'src/service/resource/resource.model'
+import type { HelpResourceModel } from 'src/service/resource/resource.model'
+import PendingCard from './components/PendingCard.vue'
+import OngoingCard from './components/OngoingCard.vue'
+import FulfillCard from './components/FulfillCard.vue'
+import CancelCard from './components/CancelCard.vue'
+
+const curTab = ref<HelpResourceStatus>(HelpResourceStatus.UNUSED)
+
+const hrList = ref<HelpResourceModel[]>([])
+
+// const isLoading = ref(true)
+
+function updateAppointList(tab: HelpResourceStatus, done?: any) {
+  getReceiverAppointList(tab)
+    .subscribe((list) => {
+      if (done)
+        done()
+      return hrList.value = list
+    })
+}
+
+function refresh(done: any) {
+  updateAppointList(curTab.value, done)
+}
+
+watch(curTab, (tab) => {
+  updateAppointList(tab)
+}, {
+  immediate: true,
+})
 </script>
 
 <template>
   <div class="q-gutter-y-md">
-    <q-tabs v-model="tab" narrow-indicator dense align="justify" class="text-primary bg-coolGray-1">
-      <q-tab :ripple="false" name="all" label="全部" />
-      <q-tab :ripple="false" name="processing" label="进行中" />
-      <q-tab :ripple="false" name="fulfilled" label="已完成" />
-      <q-tab :ripple="false" name="canceled" label="已取消" />
-      <q-tab :ripple="false" name="pending" label="未开始" />
-    </q-tabs>
-    <section class="card-list px-4 relative">
-      <q-card class="my-card" flat bordered>
-        <q-badge rounded color="green" label="未开始" absolute top-0 right-0 m-2 />
-        <q-card-section horizontal>
-          <q-card-section class="q-pt-xs">
-            <div class="text-overline">
-              3 月 12
-            </div>
-            <div class="text-h5 q-mt-sm q-mb-xs">
-              早上陪跑
-            </div>
-            <div class="text-caption text-grey">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
-            </div>
-          </q-card-section>
-
-          <q-card-section class="col-5 flex flex-center">
-            <q-img class="rounded-borders" src="https://cdn.quasar.dev/img/parallax2.jpg" />
-          </q-card-section>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions>
-          <q-avatar size="30px">
-            <img src="https://cdn.quasar.dev/img/avatar.png">
-          </q-avatar>
-          <q-btn flat>
-            7:30PM
-          </q-btn>
-          <q-btn flat>
-            取消
-          </q-btn>
-          <q-btn grow-1 color="primary">
-            开始
-          </q-btn>
-        </q-card-actions>
-      </q-card>
-    </section>
+    <q-pull-to-refresh @refresh="refresh">
+      <q-tabs v-model="curTab" outside-arrows mobile-arrows narrow-indicator dense align="justify"
+        class="text-primary bg-coolGray-1 rounded-4">
+        <q-tab v-for="(tabName, status) in status2Name" :key="status" :name="Number(status)"
+          :label="Number(status) === HelpResourceStatus.UNUSED ? '全部' : tabName" :ripple="false" />
+      </q-tabs>
+      <JsonViewer :value="hrList" copyable sort theme="light" />
+      <section class="card-list-warpper" flex flex-col gap-4>
+        <div v-for="(hr, key) in hrList" :key="key" class="card-list">
+          <PendingCard v-if="hr.status === HelpResourceStatus.PENDING" :hr="hr" :is-provider="false" />
+          <OngoingCard v-if="hr.status === HelpResourceStatus.ONGOING" :hr="hr" :is-provider="false" />
+          <FulfillCard v-if="hr.status === HelpResourceStatus.FULFILL" :hr="hr" :is-provider="false" />
+          <CancelCard v-if="hr.status === HelpResourceStatus.CANCELED" :hr="hr" :is-provider="false" />
+          <!-- <PendingCard v-else :hr="hr" /> -->
+        </div>
+      </section>
+    </q-pull-to-refresh>
   </div>
 </template>
 

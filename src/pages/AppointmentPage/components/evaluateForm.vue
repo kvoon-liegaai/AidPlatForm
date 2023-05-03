@@ -1,20 +1,15 @@
 <script setup lang='ts'>
 import { useSubscription } from '@vueuse/rxjs'
 import { createEvaluation } from 'src/service/evaluation/evaluation.api'
+import type { ProfileModel } from 'src/service/user/user.model'
+import { ratingScore2Meaning } from '../utils'
 
 const props = defineProps<{
   hrId: number
+  user?: ProfileModel
 }>()
 
 const ratingScore = ref<keyof typeof ratingScore2Meaning>(5)
-
-const ratingScore2Meaning = reactive({
-  5: { emoji: 'sentiment_very_satisfied', meaning: '非常好' },
-  4: { emoji: 'sentiment_satisfied', meaning: '好' },
-  3: { emoji: 'sentiment_neutral', meaning: '一般' },
-  2: { emoji: 'sentiment_dissatisfied', meaning: '差' },
-  1: { emoji: 'sentiment_very_dissatisfied', meaning: '非常差' },
-})
 
 const briefs = reactive([
   { value: '有礼貌', checked: false },
@@ -51,7 +46,7 @@ function submit() {
 </script>
 
 <template>
-  <section id="driver-rating-view">
+  <section v-if="props.user" id="driver-rating-view">
     <section id="content-part">
       <div class="rating-card rating-card_expanded">
         <q-avatar>
@@ -61,11 +56,11 @@ function submit() {
                                                                                                                                                                                                                                               src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg" /> -->
         <div class="rating-card__info">
           <div class="rating-card__info__name">
-            王师傅
+            {{ props.user.nickname }}
           </div>
           <div class="rating-card__info__divider" />
           <div class="rating-card__info__license-number">
-            津A·896M6
+            {{ props.user.username }}
           </div>
         </div>
         <div class="rating-card__rating-star">
@@ -102,6 +97,9 @@ function submit() {
       </div>
     </section>
   </section>
+  <section v-else>
+    未找到该用户
+  </section>
 </template>
 
 <style lang='scss' scoped>
@@ -134,8 +132,10 @@ function submit() {
   flex-direction: column;
   align-items: center;
   text-align: center;
+
   width: 332px;
   height: var(--rating-card-folded-height);
+
   background-color: #F6F6F6;
   border-radius: 21px;
   transition-property: width;

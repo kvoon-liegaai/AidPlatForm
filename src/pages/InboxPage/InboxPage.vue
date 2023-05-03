@@ -1,34 +1,18 @@
 <script setup lang='ts'>
+import type { UserModel } from 'src/service/auth/auth.model'
+import { chatSocket } from 'src/service/websocket/chat'
+import type { MessageModel } from 'src/service/websocket/types'
+import { useProfileStore } from 'src/stores/profile.store'
+
 interface IContact {
-  id: number
-  name: string
-  email: string
-  letter: string
+  chatId: number // chatId
+  targetUser: UserModel
+  message: MessageModel
 }
 
 const router = useRouter()
 
-const contacts: IContact[] = [{
-  id: 1,
-  name: 'Ruddy Jedrzej',
-  email: 'rjedrzej0@discuz.net',
-  letter: 'R',
-}, {
-  id: 2,
-  name: 'Mallorie Alessandrini',
-  email: 'malessandrini1@marketwatch.com',
-  letter: 'M',
-}, {
-  id: 3,
-  name: 'Elisabetta Wicklen',
-  email: 'ewicklen2@microsoft.com',
-  letter: 'E',
-}, {
-  id: 4,
-  name: 'Seka Fawdrey',
-  email: 'sfawdrey3@wired.com',
-  letter: 'S',
-}]
+const contacts = ref<IContact[]>()
 
 const offline = [{
   id: 5,
@@ -44,24 +28,32 @@ const offline = [{
 
 function chat(contact: IContact) {
   console.log('chat with', contact)
-  router.push('/chat')
+  router.push(`/chat/${contact.targetUser.id}`)
 }
+
+chatSocket.emit(
+  'fetch-all-chat',
+  { userId: useProfileStore().id },
+  (newContacts: IContact[]) => {
+    contacts.value = newContacts
+  },
+)
 </script>
 
 <template>
   <div>
     <q-list bordered>
-      <q-item v-for="contact in contacts" :key="contact.id" v-ripple class="q-my-sm" clickable @click="chat(contact)">
+      <q-item v-for="contact in contacts" :key="contact.chatId" v-ripple class="q-my-sm" clickable @click="chat(contact)">
         <q-item-section avatar>
           <q-avatar color="primary" text-color="white">
-            {{ contact.letter }}
+            M
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>{{ contact.name }}</q-item-label>
+          <q-item-label>{{ contact.targetUser.nickname }}</q-item-label>
           <q-item-label caption lines="1">
-            {{ contact.email }}
+            {{ contact.message.content }}
           </q-item-label>
         </q-item-section>
 

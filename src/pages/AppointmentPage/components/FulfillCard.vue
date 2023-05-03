@@ -4,14 +4,18 @@ import { status2Name } from 'src/service/resource/resource.model'
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import GeoNav from 'src/components/GeoNav.vue'
-import { date } from 'quasar'
+import { Notify, date } from 'quasar'
+import { useProfileStore } from 'src/stores/profile.store'
 import type { MapNavState } from '../types'
 import { setHrStatus, timestamp2MS } from '../utils'
 import EvaluateForm from './evaluateForm.vue'
 
 const props = defineProps<{
   hr: HelpResourceModel
+  isProvider: boolean
 }>()
+
+const selfId = useProfileStore().id
 
 const progress = computed(() => {
   if (!props.hr.record)
@@ -43,9 +47,21 @@ const mapNavState = reactive<MapNavState>({
 
 const evaluateCardState = reactive({
   isShow: false,
+  evaluation: computed(() => { // 已存在评论
+    console.log('hr.evaluations', props.hr.evaluations)
+    return props.hr.evaluations.find(evaluation => evaluation.user.id === selfId)
+  }),
+  targetUser: computed(() => {
+    return props.isProvider ? props.hr.receiver : props.hr.user
+  }),
 })
 
 function onEvaluate() {
+  if (evaluateCardState.evaluation) {
+    Notify.create('您已评价')
+    return
+  }
+
   console.log('onEvaluate', props.hr)
   evaluateCardState.isShow = true
   // setHrStatus(props.hr, HelpResourceStatus.FULFILL)
@@ -66,6 +82,7 @@ function onEvaluate() {
         </span>
       </div>
     </q-card-section>
+
     <q-card-section horizontal>
       <q-card-section>
         <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
@@ -79,6 +96,7 @@ function onEvaluate() {
           </div>
         </q-img>
       </q-card-section>
+
       <q-card-section grow-1 flex flex-col gap-5>
         <div>
           <div flex justify-between text-lg>
@@ -100,6 +118,7 @@ function onEvaluate() {
         </div>
       </q-card-section>
     </q-card-section>
+
     <q-card-section>
       <q-linear-progress size="25px" :value="progress" color="accent">
         <div class="absolute-full flex flex-center">
@@ -107,10 +126,71 @@ function onEvaluate() {
         </div>
       </q-linear-progress>
     </q-card-section>
+    <q-expansion-item>
+      <template #header>
+        <q-item-section avatar>
+          <q-avatar src="https://cdn.quasar.dev/img/parallax2.jpg" bg-cool-gray-200 text-color="white" />
+        </q-item-section>
+
+        <q-item-section>
+          {{ useProfileStore().username }}
+        </q-item-section>
+
+        <q-item-section side>
+          <div v-if="evaluateCardState.evaluation" flex gap-3>
+            <!-- <q-icon :name="ratingScore2Meaning[evaluateCardState.evaluation.ratingScore].emoji" size="30px"
+              color-yellow-800 /> -->
+            <div flex>
+              <q-icon v-for="rating in 5" :key="rating" name="star" size="30px"
+                :class="rating <= evaluateCardState.evaluation.ratingScore ? 'color-yellow-400' : 'color-yellow-200'"
+                cursor-pointer />
+            </div>
+          </div>
+        </q-item-section>
+      </template>
+
+      <q-card>
+        <q-card-section leading-loose>
+          <div>
+            开始时间： {{ date.formatDate(props.hr.record?.start_date, "YYYY年MM月DD日 HH时mm分 ") }}
+          </div>
+          <div>
+            完成时间： {{ date.formatDate(props.hr.record?.end_date, "YYYY年MM月DD日 HH时mm分 ") }}
+          </div>
+          <div>
+            评分:
+            <span v-if="props.hr.evaluations.find(item => item.id = useProfileStore().id)?.ratingScore">
+              {{ props.hr.evaluations.find(item => item.id = useProfileStore().id)?.ratingScore }} 星
+            </span>
+            <span v-else>暂无</span>
+          </div>
+          <span
+            v-for="(brief, key) in props.hr.evaluations.find(item => item.id = useProfileStore().id)?.briefs.split(',')"
+            :key="key" inline-block bg-orange-100 m-2 px-2 rounded="~ md">
+            {{ brief }}
+          </span>
+          <div>
+            <div class="">
+              服务评价
+            </div>
+            <div bg-coolgray-100 p-4 rounded-lg>
+              <span v-if="props.hr.evaluations.find(item => item.id = useProfileStore().id)?.description">
+                {{ props.hr.evaluations.find(item => item.id = useProfileStore().id)?.description }}
+              </span>
+              <span v-else>
+                暂无
+              </span>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-expansion-item>
+
+    <hr class="q-separator q-separator--horizontal" aria-orientation="horizontal">
     <q-card-actions>
       <!-- <q-btn grow-1 label="取消" flat btn-gray /> -->
-      <q-btn grow-1 :label="props.hr.evaluations ? '查看评价' : '评价'" :disable="!!props.hr.evaluations" flat bg="primary"
-        text-color="white" @click="onEvaluate" />
+      <q-btn grow-1 :label="evaluateCardState.evaluation ? '已评价' : '评价'" color="primary" text-color="white"
+        @click="onEvaluate" />
     </q-card-actions>
   </q-card>
 
@@ -142,7 +222,7 @@ function onEvaluate() {
 
       <q-page-container>
         <q-page padding bg-coolgray-100>
-          <EvaluateForm :hr-id="props.hr.id" />
+          <EvaluateForm :hr-id="props.hr.id" :user="evaluateCardState.targetUser" />
         </q-page>
       </q-page-container>
     </q-layout>

@@ -2,7 +2,7 @@
 import { Notify, useMeta } from 'quasar'
 import { useRouteQuery } from '@vueuse/router'
 import { fetchResourceListWithTag } from 'src/service/resource/resource.api'
-import { status2Name } from 'src/service/resource/resource.model'
+import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { JsonViewer } from 'vue3-json-viewer'
 import type { ExAddress } from 'src/service/map/map.model'
@@ -22,6 +22,7 @@ interface TagCardModel extends HelpResourceModel, ExAddress {
 
 const profileStore = useProfileStore()
 const tag = useRouteQuery('tag', '')
+const router = useRouter()
 
 useMeta({
   title: tag.value,
@@ -51,10 +52,14 @@ function onExpand(item: TagCardModel) {
 }
 
 const tryRequestHelp = (item: TagCardModel) => {
-  // if (Number(item.user?.id) === Number(profileStore.id)) {
-  //   Notify.create({ position: 'center', message: '你不能对自己请求帮助' })
-  //   return
-  // }
+  if (item.status !== HelpResourceStatus.UNUSED) {
+    Notify.create('当前服务占用中')
+    return
+  }
+  if (Number(item.user?.id) === Number(profileStore.id)) {
+    Notify.create({ position: 'center', message: '你不能对自己请求帮助' })
+    return
+  }
 
   if (notificationSocket.disconnected) {
     Notify.create({
@@ -93,6 +98,10 @@ const tryRequestHelp = (item: TagCardModel) => {
           break
       }
     })
+}
+
+function tryChat(userId: number) {
+  router.push(`/chat/${userId}`)
 }
 
 function refresh(done?: any) {
@@ -202,9 +211,12 @@ onMounted(() => {
             <q-card-actions>
               <div>
                 <q-btn-group :rounded="true" border="1 coolgray-300 solid" flat w-full>
-                  <q-btn flat color="primary" label="联系一下" icon="chat" />
+                  <!-- <q-btn v-if="item.user.id !== profileStore.id" flat color="primary" label="联系一下" icon="chat"
+                    @click="tryChat(item.user.id)" /> -->
+                  <q-btn flat color="primary" label="联系一下" icon="chat" @click="tryChat(item.user.id)" />
                   <q-btn flat color="info" label="查看位置" icon="map" @click="showMapViewer(item)" />
-                  <q-btn flat color="pink" label="请求帮助" icon="handshake" @click="tryRequestHelp(item)" />
+                  <q-btn v-if="item.user.id !== profileStore.id" flat color="pink" label="请求帮助" icon="handshake"
+                    @click="tryRequestHelp(item)" />
                 </q-btn-group>
               </div>
               <q-space />

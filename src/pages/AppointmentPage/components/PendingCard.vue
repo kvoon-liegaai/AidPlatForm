@@ -9,6 +9,7 @@ import { setHrStatus } from '../utils'
 
 const props = defineProps<{
   hr: HelpResourceModel
+  isProvider: boolean
 }>()
 
 const mapNavState = reactive<MapNavState>({
@@ -27,6 +28,10 @@ function showMapNav(hr: HelpResourceModel) {
 function onStart() {
   setHrStatus(props.hr, HelpResourceStatus.ONGOING)
 }
+
+function onCancel() {
+  setHrStatus(props.hr, HelpResourceStatus.CANCELED)
+}
 </script>
 
 <template>
@@ -34,7 +39,7 @@ function onStart() {
     <q-card-section horizontal>
       <q-card-section>
         <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
-        <div class="absolute-bottom text-center top-0 b-0" flex flex-col justify-center font-bold align-middle>
+          <div class="absolute-bottom text-center top-0 b-0" flex flex-col justify-center font-bold align-middle>
             <div>
               {{ Number(hr.start_date.split(' ')[0].split('-')[1]) }} 月
             </div>
@@ -69,9 +74,11 @@ function onStart() {
         </div>
       </q-card-section>
     </q-card-section>
+
+    <hr class="q-separator q-separator--horizontal" aria-orientation="horizontal">
     <q-card-actions>
-      <q-btn grow-1 label="取消" flat btn-gray />
-      <q-btn grow-1 label="开始" flat bg="primary" text-color="white" @click="showMapNav(hr)" />
+      <q-btn grow-1 label="取消" flat btn-gray @click="onCancel" />
+      <q-btn v-if="props.isProvider" grow-1 label="开始" flat bg="primary" text-color="white" @click="showMapNav(hr)" />
     </q-card-actions>
   </q-card>
   <q-dialog v-model="mapNavState.isShowMapNav">
