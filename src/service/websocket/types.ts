@@ -13,3 +13,13 @@ export interface MessageModel {
   createTime: number
   messageType: 'text'
 }
+
+export interface HrApplyModel {
+  createAt: Date
+  helpResourceId: number
+  id: number
+  providerId: number
+  status: number
+  updateAt: number
+  userId: number
+}

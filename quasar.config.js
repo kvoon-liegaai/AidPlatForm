@@ -164,6 +164,7 @@ module.exports = configure((/* ctx */) => {
     devServer: {
       https: true,
       open: false, // opens browser window automatically
+      port: 3021,
       proxy: {
         '/api': {
           target: 'http://localhost:3000',
