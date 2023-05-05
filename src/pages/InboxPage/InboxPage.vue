@@ -82,17 +82,17 @@ notificationSocket.emit(
       <q-item-label header>
         通知
       </q-item-label>
-      <q-item v-for="contact in notifications" :key="contact.id" v-ripple class="q-mb-sm" clickable>
+      <q-item v-for="notification in notifications" :key="notification.hrApplyId" v-ripple class="q-mb-sm" clickable>
         <q-item-section avatar>
           <q-avatar>
-            <img :src="`https://cdn.quasar.dev/img/${contact.avatar}`">
+            <img :src="`https://cdn.quasar.dev/img/${notification.user.avatar}`">
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>{{ contact.name }}</q-item-label>
+          <q-item-label>{{ notification.user.nickname }}</q-item-label>
           <q-item-label caption lines="1">
-            {{ contact.email }}
+            {{ notification.hrApply.createAt }}
           </q-item-label>
         </q-item-section>
 
