@@ -1,22 +1,20 @@
 <script setup lang='ts'>
-import { from, map } from 'rxjs'
-import type { UserModel } from 'src/service/auth/auth.model'
-import { getProfileById } from 'src/service/user/user.api'
 import { chatSocket } from 'src/service/websocket/chat'
 import { notificationSocket } from 'src/service/websocket/notification'
 import type { HrApplyModel, MessageModel } from 'src/service/websocket/types'
 import { useProfileStore } from 'src/stores/profile.store'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import { helpResourceApplyMsgState } from 'src/common/ws'
+import type { UserModel } from 'src/service/auth/auth.model'
 
 interface IContact {
   chatId: number // chatId
-  targetUser: ProfileModel
+  targetUser: UserModel
   message: MessageModel
 }
 
 interface Notification {
-  user: ProfileModel
+  user: UserModel
   hrApply: HrApplyModel
   hr: HelpResourceModel
 }
@@ -95,28 +93,17 @@ onMounted(() => {
       <q-item-label header>
         通知
       </q-item-label>
-<<<<<<< HEAD
       <q-item v-for="notification in notifications" :key="notification.hrApply.id" v-ripple class="q-mb-sm" clickable>
         <q-item-section avatar>
           <q-avatar bg-primary color-white>
             N
-=======
-      <q-item v-for="notification in notifications" :key="notification.hrApplyId" v-ripple class="q-mb-sm" clickable>
-        <q-item-section avatar>
-          <q-avatar>
-            <img :src="`https://cdn.quasar.dev/img/${notification.user.avatar}`">
->>>>>>> 0d502ab6d2dd4fa761279642fd3cdecbfafc9613
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
           <q-item-label>{{ notification.user.nickname }}</q-item-label>
           <q-item-label caption lines="1">
-<<<<<<< HEAD
             {{ notification.hr.name }}
-=======
-            {{ notification.hrApply.createAt }}
->>>>>>> 0d502ab6d2dd4fa761279642fd3cdecbfafc9613
           </q-item-label>
         </q-item-section>
 
