@@ -45,6 +45,14 @@ const mapNavState = reactive<MapNavState>({
   source: useDefaultCoords('object'),
 })
 
+function showMapNav(hr: HelpResourceModel) {
+  // isshow
+  mapNavState.isShowMapNav = true
+  // source
+  mapNavState.source.longitude = hr.longitude
+  mapNavState.source.latitude = hr.latitude
+}
+
 const evaluateCardState = reactive({
   isShow: false,
   evaluation: computed(() => { // 已存在评论
@@ -85,7 +93,7 @@ function onEvaluate() {
 
     <q-card-section horizontal>
       <q-card-section>
-        <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
+        <q-img class="rounded-borders" src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
           <div class="absolute-bottom text-center top-0 b-0" flex flex-col justify-center font-bold align-middle>
             <div>
               {{ Number(hr.start_date.split(' ')[0].split('-')[1]) }} 月
@@ -108,11 +116,30 @@ function onEvaluate() {
             </span>
           </div>
         </div>
-        <div flex justify-between>
-          <q-avatar size="30px">
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-          </q-avatar>
-          <q-btn icon="near_me" btn-gray label="去这里" flat />
+        <!-- <q-item>
+          <q-item-section top avatar>
+            <q-avatar size="30px">
+              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            </q-avatar>
+          </q-item-section>
+          <q-item-section>
+          <q-item-label> {{ 0 }}</q-item-label>
+          </q-item-section>
+          <q-item-section side top>
+            <q-icon name="star" color="yellow" />
+          </q-item-section>
+        </q-item> -->
+        <div flex gap-2>
+          <!-- <q-btn icon="chat" btn-gray flat label="聊天" rounded /> -->
+          <q-chip clickable text-color="primary">
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            </q-avatar>
+            联系一下
+          </q-chip>
+          <q-chip clickable bg-cool-gray-200 text-color="primary" icon="near_me" @click="showMapNav(hr)">
+            查看位置
+          </q-chip>
           <!-- <q-chip square color="primary" text-color="white" icon="event">
                                                                                                                                                                                                                                                                                                                                                                                     </q-chip> -->
         </div>
@@ -129,7 +156,9 @@ function onEvaluate() {
     <q-expansion-item>
       <template #header>
         <q-item-section avatar>
-          <q-avatar src="https://cdn.quasar.dev/img/parallax2.jpg" bg-cool-gray-200 text-color="white" />
+          <q-avatar size="30px">
+            <img src="https://cdn.quasar.dev/img/avatar1.jpg">
+          </q-avatar>
         </q-item-section>
 
         <q-item-section>
@@ -205,7 +234,7 @@ function onEvaluate() {
 
       <q-page-container>
         <q-page>
-          <GeoNav :state="mapNavState" @set-hr-status="setHrStatus" />
+          <GeoNav :state="mapNavState" :starter="false" @set-hr-status="setHrStatus" />
         </q-page>
       </q-page-container>
     </q-layout>

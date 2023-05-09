@@ -45,6 +45,14 @@ const mapNavState = reactive<MapNavState>({
   source: useDefaultCoords('object'),
 })
 
+function showMapNav(hr: HelpResourceModel) {
+  // isshow
+  mapNavState.isShowMapNav = true
+  // source
+  mapNavState.source.longitude = hr.longitude
+  mapNavState.source.latitude = hr.latitude
+}
+
 function onFinish() {
   console.log('onfinish', props.hr)
   setHrStatus(props.hr, HelpResourceStatus.FULFILL)
@@ -93,11 +101,21 @@ function onCancel() {
             </span>
           </div>
         </div>
-        <div flex justify-between>
-          <q-avatar size="30px">
+        <div flex gap-2>
+          <!-- <q-avatar size="30px">
             <img src="https://cdn.quasar.dev/img/boy-avatar.png">
           </q-avatar>
-          <q-btn icon="near_me" btn-gray label="去这里" flat />
+          <q-btn icon="chat" btn-gray label="联系一下" flat dense /> -->
+          <q-chip clickable text-color="primary">
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            </q-avatar>
+            联系一下
+          </q-chip>
+          <q-chip clickable bg-cool-gray-200 text-color="primary" icon="near_me" btn-gray flat @click="showMapNav(hr)">
+            查看位置
+          </q-chip>
+          <!-- <q-btn icon =" /> -->
           <!-- <q-chip square color="primary" text-color="white" icon="event">
                                                                                                                               </q-chip> -->
         </div>
@@ -114,8 +132,9 @@ function onCancel() {
     <hr class="q-separator q-separator--horizontal" aria-orientation="horizontal">
     <q-card-actions>
       <!-- <q-btn grow-1 label="取消" flat btn-gray /> -->
-      <q-btn v-if="!props.isProvider" color="red" icon="local_police" label="报警" @click="callPolice" />
-      <q-btn grow-1 label="取消" flat bg="primary" text-color="white" @click="onCancel" />
+      <q-btn v-if="!props.isProvider" color="blue" icon="local_police" label="报警" @click="callPolice" />
+      <q-btn grow-1 label="取消" color="red" @click="onCancel" />
+      <q-btn grow-1 label="完成" flat bg="primary" text-color="white" @click="onFinish" />
     </q-card-actions>
   </q-card>
 
@@ -130,7 +149,7 @@ function onCancel() {
 
       <q-page-container>
         <q-page>
-          <GeoNav :state="mapNavState" @set-hr-status="setHrStatus" />
+          <GeoNav :state="mapNavState" :start="false" :starter="false" @set-hr-status="setHrStatus" />
         </q-page>
       </q-page-container>
     </q-layout>

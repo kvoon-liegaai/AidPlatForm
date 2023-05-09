@@ -8,7 +8,7 @@ export interface UserModel {
   id: number
   username: string // 用户名
   nickname: string // 昵称
-  password: string // 密码
+  password?: string // 密码
   avatar: string
   email: string
   role: Role // 用户角色

@@ -1,41 +1,59 @@
 <script setup lang='ts'>
-import { from, map } from 'rxjs'
-import type { UserModel } from 'src/service/auth/auth.model'
-import { getProfileById } from 'src/service/user/user.api'
+import type { ProfileModel } from 'src/service/user/user.model'
 import { chatSocket } from 'src/service/websocket/chat'
 import { notificationSocket } from 'src/service/websocket/notification'
 import type { HrApplyModel, MessageModel } from 'src/service/websocket/types'
 import { useProfileStore } from 'src/stores/profile.store'
+import type { HelpResourceModel } from 'src/service/resource/resource.model'
+import { helpResourceApplyMsgState } from 'src/common/ws'
 
 interface IContact {
   chatId: number // chatId
-  targetUser: UserModel
+  targetUser: ProfileModel
   message: MessageModel
 }
 
 interface Notification {
-  hrApplyId: number
-  user: UserModel
+  user: ProfileModel
   hrApply: HrApplyModel
+  hr: HelpResourceModel
 }
 
 const router = useRouter()
 
-const notifications = ref<Notification[]>()
+const notifications = ref<Notification[]>([])
 
 const contacts = ref<IContact[]>()
 
-const offline = [{
-  id: 5,
-  name: 'Brunhilde Panswick',
-  email: 'bpanswick4@csmonitor.com',
-  avatar: 'avatar2.jpg',
-}, {
-  id: 6,
-  name: 'Winfield Stapforth',
-  email: 'wstapforth5@pcworld.com',
-  avatar: 'avatar6.jpg',
-}]
+function onAgree(notification: Notification) {
+  console.log('onAgree')
+  notificationSocket.emit(
+    'handle-apply',
+    {
+      helpResourceId: notification.hr.id,
+      userId: notification.user.id,
+      status: helpResourceApplyMsgState.FULFILLED,
+    },
+    () => {
+      refresh()
+    },
+  )
+}
+
+function onReject(notification: Notification) {
+  console.log('onReject')
+  notificationSocket.emit(
+    'handle-apply',
+    {
+      helpResourceId: notification.hr.id,
+      userId: notification.user.id,
+      status: helpResourceApplyMsgState.FULFILLED,
+    },
+    () => {
+      refresh()
+    },
+  )
+}
 
 function chat(contact: IContact) {
   console.log('chat with', contact)
@@ -51,53 +69,56 @@ chatSocket.emit(
   },
 )
 
-notificationSocket.emit(
-  'fetch-all-hrApply',
-  { userId: useProfileStore().id },
-  (hrApplyList: HrApplyModel[]) => {
-    from(hrApplyList)
-      .pipe(
-        map((hrApply) => {
-          let notification: Notification
-          getProfileById(hrApply.userId)
-          // TODO: 05.04
-          // .subscribe((user: UserModel) => {
-          //   notification.user = user
-          // })
-        }),
-      )
-    // hrApplyList.map((hrApply: HrApplyModel) => {
-    //   getProfileById(hrApply.userId)
-    //     .subscribe((user: UserModel) => {
+function refresh(done?: () => void) {
+  notificationSocket.emit(
+    'fetch-all-hrApply',
+    { providerId: useProfileStore().id },
+    (notificationList: Notification[]) => {
+      console.log('notificationList', notificationList)
+      notifications.value = notificationList
+      if (done)
+        done()
+    },
+  )
+}
 
-    //     })
-    // })
-  },
-)
+onMounted(() => {
+  refresh()
+})
 </script>
 
 <template>
-  <div>
+  <q-pull-to-refresh color="primary" @refresh="refresh">
     <q-list bordered>
       <q-item-label header>
         通知
       </q-item-label>
-      <q-item v-for="contact in notifications" :key="contact.id" v-ripple class="q-mb-sm" clickable>
+      <q-item v-for="notification in notifications" :key="notification.hrApply.id" v-ripple class="q-mb-sm" clickable>
         <q-item-section avatar>
-          <q-avatar>
-            <img :src="`https://cdn.quasar.dev/img/${contact.avatar}`">
+          <q-avatar bg-primary color-white>
+            N
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>{{ contact.name }}</q-item-label>
+          <q-item-label>{{ notification.user.nickname }}</q-item-label>
           <q-item-label caption lines="1">
-            {{ contact.email }}
+            {{ notification.hr.name }}
           </q-item-label>
         </q-item-section>
 
         <q-item-section side>
-          <q-icon name="chat_bubble" color="grey" />
+          <q-btn-group outline>
+            <q-btn v-if="notification.hrApply.status === helpResourceApplyMsgState.FULFILLED" label="已同意" color="gray"
+              flat dense />
+            <q-btn v-if="notification.hrApply.status === helpResourceApplyMsgState.REJECTED" label="已拒绝" color="gray" flat
+              dense />
+            <div v-if="notification.hrApply.status === helpResourceApplyMsgState.PENDING">
+              <q-btn label="拒绝" color="negative" flat dense @click="onReject(notification)" />
+              <q-btn label="同意" color="primary" flat dense @click="onAgree(notification)" />
+            </div>
+            <!-- <q-btn label="查看" color="primary" flat dense /> -->
+          </q-btn-group>
         </q-item-section>
       </q-item>
 
@@ -121,11 +142,11 @@ notificationSocket.emit(
         </q-item-section>
 
         <q-item-section side>
-          <q-icon name="chat_bubble" color="green" />
+          <q-icon name="chat_bubble" color-cool-gray-400 />
         </q-item-section>
       </q-item>
     </q-list>
-  </div>
+  </q-pull-to-refresh>
 </template>
 
 <style lang='scss' scoped></style>

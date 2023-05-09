@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { Notify, useMeta } from 'quasar'
+import { Notify, date, useMeta } from 'quasar'
 import { useRouteQuery } from '@vueuse/router'
 import { fetchResourceListWithTag } from 'src/service/resource/resource.api'
 import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
@@ -12,7 +12,6 @@ import { useDefaultCoords } from 'src/composition/geo'
 import GeoViewer from 'components/GeoViewer.vue'
 import { ReturnCode } from 'src/common/ws'
 import type { WsRes } from 'src/common/ws'
-import { formatDate } from 'src/utils/date'
 import { notificationSocket } from 'src/service/websocket/notification'
 import { useSubscription } from '@vueuse/rxjs'
 
@@ -129,7 +128,7 @@ onMounted(() => {
 
 <template>
   <q-pull-to-refresh color="primary" @refresh="refresh">
-    <JsonViewer :value="tagList" copyable sort theme="dark" />
+    <JsonViewer :value="tagList" copyable sort />
     <div class="flex flex-col mt-4">
       <div class="font-bold text-lg">
         List
@@ -141,7 +140,7 @@ onMounted(() => {
 
             <q-card-section class="flex justify-between">
               <div class="text-gray-500">
-                {{ formatDate(item.createTime) }}
+                {{ date.formatDate(item.createTime, 'YYYY年MM月DD日 HH:mm') }}
               </div>
               <div>
                 <!-- TODO: 补全颜色 -->
@@ -171,11 +170,11 @@ onMounted(() => {
                 </q-item-section>
 
                 <q-item-section side>
-                  <div class="row items-center">
+                  <!-- <div class="row items-center">
                     <q-icon name="star" color="red" size="24px" />
                     <q-icon name="star" color="red" size="24px" />
                     <q-icon name="star" color="red" size="24px" />
-                  </div>
+                  </div> -->
                 </q-item-section>
               </template>
               <q-card>

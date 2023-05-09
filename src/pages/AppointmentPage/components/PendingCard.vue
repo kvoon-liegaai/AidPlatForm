@@ -15,14 +15,16 @@ const props = defineProps<{
 const mapNavState = reactive<MapNavState>({
   isShowMapNav: false,
   source: useDefaultCoords('object'),
+  isStarter: false,
 })
 
-function showMapNav(hr: HelpResourceModel) {
+function showMapNav(hr: HelpResourceModel, isStarter: boolean) {
   // isshow
   mapNavState.isShowMapNav = true
   // source
   mapNavState.source.longitude = hr.longitude
   mapNavState.source.latitude = hr.latitude
+  mapNavState.isStarter = isStarter
 }
 
 function onStart() {
@@ -65,12 +67,15 @@ function onCancel() {
           </div>
         </div>
         <div flex justify-between>
-          <q-avatar size="30px">
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-          </q-avatar>
-          <q-btn icon="near_me" btn-gray label="去这里" flat />
-          <!-- <q-chip square color="primary" text-color="white" icon="event">
-                                                      </q-chip> -->
+          <q-chip clickable text-color="primary">
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            </q-avatar>
+            联系一下
+          </q-chip>
+          <q-chip clickable bg-cool-gray-200 text-color="primary" icon="near_me" @click="showMapNav(hr, false)">
+            查看位置
+          </q-chip>
         </div>
       </q-card-section>
     </q-card-section>
@@ -78,7 +83,8 @@ function onCancel() {
     <hr class="q-separator q-separator--horizontal" aria-orientation="horizontal">
     <q-card-actions>
       <q-btn grow-1 label="取消" flat btn-gray @click="onCancel" />
-      <q-btn v-if="props.isProvider" grow-1 label="开始" flat bg="primary" text-color="white" @click="showMapNav(hr)" />
+      <q-btn v-if="props.isProvider" grow-1 label="开始" flat bg="primary" text-color="white"
+        @click="showMapNav(hr, true)" />
     </q-card-actions>
   </q-card>
   <q-dialog v-model="mapNavState.isShowMapNav">
@@ -92,7 +98,7 @@ function onCancel() {
 
       <q-page-container>
         <q-page>
-          <GeoNav :state="mapNavState" @on-start="onStart" />
+          <GeoNav :state="mapNavState" :starter="false" @on-start="onStart" />
         </q-page>
       </q-page-container>
     </q-layout>

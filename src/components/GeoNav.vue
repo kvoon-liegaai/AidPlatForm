@@ -10,6 +10,7 @@ import type { MapNavState } from 'src/pages/AppointmentPage/types'
 
 const props = defineProps<{
   state: MapNavState
+  starter?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -81,6 +82,10 @@ onMounted(() => {
     const targetMarker = new AMap.Marker({
       position: new AMap.LngLat(...center),
       title: cardInfo.value.address,
+      icon: new AMap.Icon({
+        image: 'src/assets/marker/self-location.svg',
+      }),
+      anchor: 'center',
     })
       .addTo(mapObj)
 
@@ -149,7 +154,7 @@ onUnmounted(() => {
       <span font-bold> {{ ` ${distance.toFixed(1)} ` }}</span>
       米
     </div>
-    <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
+    <q-card v-if="props.starter" class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
       <q-card-section class="bg-grey-8 text-white">
         <div class="text-h6">
           {{ cardInfo.address }}
