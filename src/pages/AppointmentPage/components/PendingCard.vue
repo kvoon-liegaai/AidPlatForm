@@ -12,6 +12,8 @@ const props = defineProps<{
   isProvider: boolean
 }>()
 
+const router = useRouter()
+
 const mapNavState = reactive<MapNavState>({
   isShowMapNav: false,
   source: useDefaultCoords('object'),
@@ -40,7 +42,7 @@ function onCancel() {
   <q-card class="my-card">
     <q-card-section horizontal>
       <q-card-section>
-        <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
+        <q-img class="rounded-borders" src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
           <div class="absolute-bottom text-center top-0 b-0" flex flex-col justify-center font-bold align-middle>
             <div>
               {{ Number(hr.start_date.split(' ')[0].split('-')[1]) }} 月
@@ -67,9 +69,10 @@ function onCancel() {
           </div>
         </div>
         <div flex justify-between>
-          <q-chip clickable text-color="primary">
+          <q-chip clickable text-color="primary"
+            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : void 0">
             <q-avatar>
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              <img src=" https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>
             联系一下
           </q-chip>

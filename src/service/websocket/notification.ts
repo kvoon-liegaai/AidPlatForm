@@ -29,7 +29,7 @@ notificationSocket.on('disconnect', () => {
 })
 
 // watch ws event
-notificationSocket.on('apply-hr', ({ userId, helpResourceId }: { userId: number; helpResourceId: number }) => {
+notificationSocket.on('apply-hr', ({ hrApplyId, userId, helpResourceId }: { hrApplyId: number; userId: number; helpResourceId: number }) => {
   console.log('userId', userId)
   const applyHrInfo$ = zip(
     getProfileById(userId),
@@ -45,6 +45,7 @@ notificationSocket.on('apply-hr', ({ userId, helpResourceId }: { userId: number;
     })
       .onOk(() => {
         notificationSocket.emit('handle-apply', {
+          hrApplyId,
           helpResourceId,
           userId,
           status: helpResourceApplyMsgState.FULFILLED,
@@ -52,6 +53,7 @@ notificationSocket.on('apply-hr', ({ userId, helpResourceId }: { userId: number;
       })
       .onCancel(() => {
         notificationSocket.emit('handle-apply', {
+          hrApplyId,
           helpResourceId,
           userId,
           status: helpResourceApplyMsgState.REJECTED,

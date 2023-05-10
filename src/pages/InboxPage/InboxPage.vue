@@ -30,6 +30,7 @@ function onAgree(notification: Notification) {
   notificationSocket.emit(
     'handle-apply',
     {
+      hrApplyId: notification.hrApply.id,
       helpResourceId: notification.hr.id,
       userId: notification.user.id,
       status: helpResourceApplyMsgState.FULFILLED,
@@ -45,9 +46,10 @@ function onReject(notification: Notification) {
   notificationSocket.emit(
     'handle-apply',
     {
+      hrApplyId: notification.hrApply.id,
       helpResourceId: notification.hr.id,
       userId: notification.user.id,
-      status: helpResourceApplyMsgState.FULFILLED,
+      status: helpResourceApplyMsgState.REJECTED,
     },
     () => {
       refresh()
@@ -60,22 +62,22 @@ function chat(contact: IContact) {
   router.push(`/chat/${contact.targetUser.id}`)
 }
 
-chatSocket.emit(
-  'fetch-all-chat',
-  { userId: useProfileStore().id },
-  (newContacts: IContact[]) => {
-    contacts.value = newContacts
-    console.log('newContacts', newContacts)
-  },
-)
-
 function refresh(done?: () => void) {
+  chatSocket.emit(
+    'fetch-all-chat',
+    { userId: useProfileStore().id },
+    (newContacts: IContact[]) => {
+      contacts.value = newContacts.sort((a, b) => a.message.createTime - b.message.createTime)
+      console.log('newContacts', newContacts)
+    },
+  )
   notificationSocket.emit(
     'fetch-all-hrApply',
     { providerId: useProfileStore().id },
     (notificationList: Notification[]) => {
       console.log('notificationList', notificationList)
       notifications.value = notificationList
+        .sort(() => -1)
       if (done)
         done()
     },
@@ -96,7 +98,7 @@ onMounted(() => {
       <q-item v-for="notification in notifications" :key="notification.hrApply.id" v-ripple class="q-mb-sm" clickable>
         <q-item-section avatar>
           <q-avatar bg-primary color-white>
-            N
+            <q-icon name="mark_email_unread" />
           </q-avatar>
         </q-item-section>
 
@@ -130,7 +132,7 @@ onMounted(() => {
       <q-item v-for="contact in contacts" :key="contact.chatId" v-ripple class="q-my-sm" clickable @click="chat(contact)">
         <q-item-section avatar>
           <q-avatar color="primary" text-color="white">
-            M
+            <q-icon name="mark_chat_unread" />
           </q-avatar>
         </q-item-section>
 

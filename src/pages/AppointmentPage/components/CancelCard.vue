@@ -73,7 +73,7 @@ const evaluateCardState = reactive({
 
     <q-card-section horizontal>
       <q-card-section>
-        <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
+        <q-img class="rounded-borders" src="https://cdn.quasar.dev/img/parallax2.jpg" width="80px" height="100%">
           <div class="absolute-bottom text-center top-0 b-0" flex flex-col justify-center font-bold align-middle>
             <div>
               {{ Number(hr.start_date.split(' ')[0].split('-')[1]) }} 月

@@ -15,6 +15,8 @@ const props = defineProps<{
   isProvider: boolean
 }>()
 
+const router = useRouter()
+
 const selfId = useProfileStore().id
 
 const progress = computed(() => {
@@ -131,7 +133,8 @@ function onEvaluate() {
         </q-item> -->
         <div flex gap-2>
           <!-- <q-btn icon="chat" btn-gray flat label="聊天" rounded /> -->
-          <q-chip clickable text-color="primary">
+          <q-chip clickable text-color="primary"
+            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : void 0">
             <q-avatar>
               <img src="https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>

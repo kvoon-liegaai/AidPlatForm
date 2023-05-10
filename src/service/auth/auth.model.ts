@@ -14,6 +14,7 @@ export interface UserModel {
   role: Role // 用户角色
   createTime: Date
   updateTime: Date
+  describe: string
 }
 
 export interface LoginParams extends Pick<UserModel, 'username'> {
