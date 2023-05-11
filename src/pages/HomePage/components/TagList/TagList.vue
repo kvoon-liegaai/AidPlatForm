@@ -130,9 +130,9 @@ onMounted(() => {
   <q-pull-to-refresh color="primary" @refresh="refresh">
     <JsonViewer :value="tagList" copyable sort />
     <div class="flex flex-col mt-4">
-      <div class="font-bold text-lg">
+      <!-- <div class="font-bold text-lg">
         List
-      </div>
+      </div> -->
       <div class="mt-4">
         <div>
           <q-card v-for="(item, index) in tagList" :key="index" class="bg-white rounded-lg shadow-md mb-4">
@@ -212,7 +212,8 @@ onMounted(() => {
                 <q-btn-group :rounded="true" border="1 coolgray-300 solid" flat w-full>
                   <!-- <q-btn v-if="item.user.id !== profileStore.id" flat color="primary" label="联系一下" icon="chat"
                     @click="tryChat(item.user.id)" /> -->
-                  <q-btn flat color="primary" label="联系一下" icon="chat" @click="tryChat(item.user.id)" />
+                  <q-btn v-if="item.user.id !== profileStore.id" flat color="primary" label="联系一下" icon="chat"
+                    @click="tryChat(item.user.id)" />
                   <q-btn flat color="info" label="查看位置" icon="map" @click="showMapViewer(item)" />
                   <q-btn v-if="item.user.id !== profileStore.id" flat color="pink" label="请求帮助" icon="handshake"
                     @click="tryRequestHelp(item)" />

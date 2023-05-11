@@ -14,22 +14,21 @@ import type { EvaluationModel } from 'src/service/evaluation/evaluation.model'
 const profileStore = useProfileStore()
 
 const profile = ref<ProfileModel>(DEFAULT_PROFILE)
-const helpResourceList = ref<HelpResourceModel[] | []>([])
+const helpResourceList = ref<HelpResourceModel[]>([])
 const evaluationList = ref<EvaluationModel[]>([])
 
 const ratingModel = ref(4)
-const commentsRecords = ref([
-  { id: 0, userId: 0, username: 'peter', date: '2023-12-13', comments: 'asd;lfa;sdfa', rating: 4 },
-  { id: 0, userId: 0, username: 'peter', date: '2023-12-13', comments: 'asd;lfa;sdfa', rating: 4 },
-  { id: 0, userId: 0, username: 'peter', date: '2023-12-13', comments: 'asd;lfa;sdfa', rating: 4 },
-  { id: 0, userId: 0, username: 'peter', date: '2023-12-13', comments: 'asd;lfa;sdfa', rating: 4 },
-])
 
 const editDialogState = reactive({
   visible: false,
   nickname: '',
   email: '',
   describe: '',
+})
+
+const checkHrDialogState = reactive({
+  visible: false,
+  hr: helpResourceList.value[0],
 })
 
 watch(() => editDialogState.visible, (v) => {
@@ -69,7 +68,10 @@ function loadProfile() {
 function loadHelpResourceList() {
   useSubscription(
     getProvidedResources(profileStore.id)
-      .subscribe(val => helpResourceList.value = val),
+      .subscribe((hrList) => {
+        console.log('hrList', hrList)
+        helpResourceList.value = hrList
+      }),
   )
 }
 
@@ -83,7 +85,7 @@ function loadEvaluationList() {
 function handleDeleteHR(helpResourceId: number) {
   console.log('handle delete hr')
   Dialog.create({
-    title: '删除互助服务',
+    title: '删除',
     color: 'red',
     message: '确定要删除掉吗?',
     ok: '确定',
@@ -114,6 +116,51 @@ onMounted(() => {
 </script>
 
 <template>
+  <q-dialog v-model="checkHrDialogState.visible">
+    <q-card class="my-card">
+      <img src="https://cdn.quasar.dev/img/mountains.jpg">
+      <q-card-section>
+        <div class="text-h6">
+          {{ checkHrDialogState.hr.name }}
+        </div>
+      </q-card-section>
+      <q-card-section>
+        <section>
+          <span color-primary>
+            分区
+          </span>
+          <span color-coolgray-400>
+            {{ checkHrDialogState.hr.subArea }} - {{ checkHrDialogState.hr.tag }}
+          </span>
+        </section>
+        <section>
+          <span color-primary>
+            描述
+          </span>
+          <span color-coolgray-400>
+            {{ checkHrDialogState.hr.describe }}
+          </span>
+        </section>
+        <section>
+          <span color-primary>
+            预定时间
+          </span>
+          <span color-coolgray-400>
+            {{ checkHrDialogState.hr.start_date }} - {{ checkHrDialogState.hr.end_date }}
+          </span>
+        </section>
+        <section>
+          <span color-primary>
+            地理位置
+          </span>
+          <span color-coolgray-400>
+            {{ checkHrDialogState.hr.start_date }} - {{ checkHrDialogState.hr.end_date }}
+          </span>
+        </section>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
+  <!-- 资料编辑 dialog -->
   <q-dialog v-model="editDialogState.visible" persistent>
     <q-card w-full>
       <q-toolbar>
@@ -167,10 +214,10 @@ onMounted(() => {
               </div>
               <div class="card-item" bg="[#F1F4FDFF]">
                 <div class="card-item__title">
-                  评价等级
+                  服务次数
                 </div>
                 <div class="card-item__score">
-                  4.5
+                  12
                 </div>
                 <div class="card-item__icon">
                   <q-icon class="i-mdi-cellphone-cog" />
@@ -199,7 +246,7 @@ onMounted(() => {
         <div class="title">
           历史评价
         </div>
-        <q-scroll-area h-60>
+        <q-scroll-area v-if="evaluationList.length" h-60>
           <div class="row no-wrap">
             <div v-for="(evaluation, key) in evaluationList" :key="key" class="q-pa-sm">
               <q-card class="my-card bg-[#FAFAFBFF]" w-75 flat>
@@ -236,6 +283,9 @@ onMounted(() => {
             </div>
           </div>
         </q-scroll-area>
+        <div v-else color-bluegray leading-relaxed>
+          暂无历史评价
+        </div>
       </div>
 
       <div class="provided-service">
@@ -253,17 +303,22 @@ onMounted(() => {
                   {{ hr.name }}
                 </div>
                 <div class="text-subtitle2">
-                  {{ hr.start_date }}
+                  {{ hr.tag }}
                 </div>
               </div>
             </q-img>
             <q-card-actions>
-              <q-btn flat>
-                编辑
-              </q-btn>
-              <q-btn flat color="negative" @click="handleDeleteHR(hr.id)">
-                删除
-              </q-btn>
+              <q-btn-group flat>
+                <q-btn dense flat>
+                  编辑
+                </q-btn>
+                <q-btn dense flat @click="() => { checkHrDialogState.visible = true; checkHrDialogState.hr = hr }">
+                  查看
+                </q-btn>
+                <q-btn dense flat color="negative" @click="handleDeleteHR(hr.id)">
+                  删除
+                </q-btn>
+              </q-btn-group>
             </q-card-actions>
           </q-card>
         </div>

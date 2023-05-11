@@ -6,6 +6,7 @@ export interface CreateEvaluationParams {
   description: string
   ratingScore: 1 | 2 | 3 | 4 | 5
   hrId: number
+  targetUserId: number
 }
 
 export interface EvaluationModel {
@@ -16,4 +17,5 @@ export interface EvaluationModel {
   ratingScore: 1 | 2 | 3 | 4 | 5
   hr: HelpResourceModel
   user: UserModel
+  targetUser: UserModel
 }

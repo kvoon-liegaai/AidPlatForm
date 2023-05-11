@@ -101,7 +101,7 @@ function onCancel() {
 
       <q-page-container>
         <q-page>
-          <GeoNav :state="mapNavState" :starter="false" @on-start="onStart" />
+          <GeoNav :state="mapNavState" :starter="true" @on-start="onStart" />
         </q-page>
       </q-page-container>
     </q-layout>

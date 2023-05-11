@@ -6,7 +6,7 @@ import { ratingScore2Meaning } from '../utils'
 
 const props = defineProps<{
   hrId: number
-  user?: ProfileModel
+  user: ProfileModel// targetUser
 }>()
 
 const ratingScore = ref<keyof typeof ratingScore2Meaning>(5)
@@ -39,6 +39,7 @@ function submit() {
       description: description.value,
       ratingScore: ratingScore.value,
       hrId: props.hrId,
+      targetUserId: props.user.id,
     })
       .subscribe(console.log),
   )
