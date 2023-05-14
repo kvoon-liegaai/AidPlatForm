@@ -13,3 +13,7 @@ export const createEvaluation = (params: CreateEvaluationParams) => {
 export function getAllEvaluation(): Observable<EvaluationModel[]> {
   return http.get<EvaluationModel[]>(EvaluationApi.Base)
 }
+
+export function getAverageScore(targetUserId: number) {
+  return http.get<number>(`${EvaluationApi.Base}/${targetUserId}`)
+}

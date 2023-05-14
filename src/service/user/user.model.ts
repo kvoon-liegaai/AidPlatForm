@@ -13,6 +13,7 @@ export interface ProfileModel {
   updateTime: string
   avatar: string
   describe: string
+  serviceTimes: number
 }
 
 export const DEFAULT_PROFILE: ProfileModel = {
@@ -25,4 +26,5 @@ export const DEFAULT_PROFILE: ProfileModel = {
   updateTime: '',
   avatar: '',
   describe: '',
+  serviceTimes: 0,
 }

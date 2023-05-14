@@ -124,6 +124,14 @@ onMounted(() => {
         </q-item-section>
       </q-item>
 
+      <q-item v-if="!notifications.length">
+        <q-item-section>
+          <q-item-label caption>
+            暂无
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+
       <q-separator />
 
       <q-item-label header>

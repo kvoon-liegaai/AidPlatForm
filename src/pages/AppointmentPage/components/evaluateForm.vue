@@ -55,13 +55,12 @@ function submit() {
         </q-avatar>
         <!-- <van-image class="rating-card__avatar" :width="98" :height="98" round
                                                                                                                                                                                                                                               src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg" /> -->
-        <div class="rating-card__info">
+        <div class="rating-card__info" flex flex-col items-center>
           <div class="rating-card__info__name">
             {{ props.user.nickname }}
           </div>
-          <div class="rating-card__info__divider" />
           <div class="rating-card__info__license-number">
-            {{ props.user.username }}
+            {{ props.user.email }}
           </div>
         </div>
         <div class="rating-card__rating-star">

@@ -1,14 +1,14 @@
 <script setup lang='ts'>
 import { getProfileById, updateUserProfile } from 'src/service/user/user.api'
-import { DEFAULT_PROFILE } from 'src/service/user/user.model'
 import type { ProfileModel } from 'src/service/user/user.model'
+import { DEFAULT_PROFILE } from 'src/service/user/user.model'
 import { useProfileStore } from 'src/stores/profile.store'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
-import { useSubscription } from '@vueuse/rxjs'
+import { toObserver, useSubscription } from '@vueuse/rxjs'
 import { deleteHelpResource, getProvidedResources } from 'src/service/resource/resource.api'
 import { Dialog, Notify } from 'quasar'
 import { tap } from 'rxjs'
-import { getAllEvaluation } from 'src/service/evaluation/evaluation.api'
+import { getAllEvaluation, getAverageScore } from 'src/service/evaluation/evaluation.api'
 import type { EvaluationModel } from 'src/service/evaluation/evaluation.model'
 
 const profileStore = useProfileStore()
@@ -16,8 +16,7 @@ const profileStore = useProfileStore()
 const profile = ref<ProfileModel>(DEFAULT_PROFILE)
 const helpResourceList = ref<HelpResourceModel[]>([])
 const evaluationList = ref<EvaluationModel[]>([])
-
-const ratingModel = ref(4)
+const averageScore = ref(0)
 
 const editDialogState = reactive({
   visible: false,
@@ -106,6 +105,8 @@ function refresh(done?: () => void) {
   loadProfile()
   loadHelpResourceList()
   loadEvaluationList()
+  getAverageScore(profileStore.id)
+    .subscribe(toObserver(averageScore))
   if (done)
     done()
 }
@@ -203,13 +204,13 @@ onMounted(() => {
             <div class="card-group" flex gap-4>
               <div class="card-item bg-[#EBFDFFFF]">
                 <div class="card-item__title">
-                  评价等级
+                  评分
                 </div>
                 <div class="card-item__score">
-                  4
+                  {{ averageScore }}
                 </div>
                 <div class="card-item__icon">
-                  <q-rating v-model="ratingModel" readonly />
+                  <q-rating v-model="averageScore" readonly />
                 </div>
               </div>
               <div class="card-item" bg="[#F1F4FDFF]">
@@ -217,7 +218,7 @@ onMounted(() => {
                   服务次数
                 </div>
                 <div class="card-item__score">
-                  12
+                  {{ profile.serviceTimes }}
                 </div>
                 <div class="card-item__icon">
                   <q-icon class="i-mdi-cellphone-cog" />
@@ -244,7 +245,7 @@ onMounted(() => {
 
       <div class="comment-record">
         <div class="title">
-          历史评价
+          我的评价
         </div>
         <q-scroll-area v-if="evaluationList.length" h-60>
           <div class="row no-wrap">
@@ -257,10 +258,10 @@ onMounted(() => {
                         {{ evaluation.hr.name }}
                       </div>
                     </div>
-                    <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
+                    <!-- <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
                       <q-icon name="event" />
                       {{ evaluation.id }}
-                    </div>
+                    </div> -->
                   </div>
                   <q-rating v-model="evaluation.ratingScore" readonly :max="5" size="20px" />
                 </q-card-section>
@@ -284,7 +285,7 @@ onMounted(() => {
           </div>
         </q-scroll-area>
         <div v-else color-bluegray leading-relaxed>
-          暂无历史评价
+          暂无
         </div>
       </div>
 

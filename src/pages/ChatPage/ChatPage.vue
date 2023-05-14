@@ -75,7 +75,7 @@ function sendMsg() {
             <div style="width: 100%; max-width: 400px">
               <q-chat-message v-for="(message, key) in messageList" :key="key"
                 :name="message.userId === selfProfile.id ? selfProfile.nickname : targetUserProfile?.nickname"
-                avatar="https://cdn.quasar.dev/img/avatar3.jpg" :text="[message.content]"
+                :avatar="`https://cdn.quasar.dev/img/avatar${message.userId}.jpg`" :text="[message.content]"
                 :stamp="date.formatDate(message.createTime, 'MM月DD日 HH时mm分 ')" :sent="message.userId === selfProfile.id"
                 :text-color="message.userId === selfProfile.id ? 'white' : 'black'"
                 :bg-color="message.userId === selfProfile.id ? 'primary' : 'white'" />

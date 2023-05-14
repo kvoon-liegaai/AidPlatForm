@@ -157,6 +157,7 @@ module.exports = configure((/* ctx */) => {
             },
           },
         ],
+        ['vite-plugin-vue-devtools', {}],
       ],
     },
 
