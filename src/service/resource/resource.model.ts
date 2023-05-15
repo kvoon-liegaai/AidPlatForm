@@ -48,6 +48,15 @@ export type CreateHelpResourceParams = Pick<
   'describe'
 >
 
+export type QuickMatchParams = Pick<
+  HelpResourceModel,
+  'longitude' |
+  'latitude' |
+  'subArea' |
+  'start_date' |
+  'end_date'
+>
+
 export interface RecordModel {
   id: number
   create_date: Date

@@ -2,20 +2,38 @@
 import { useLocalStorage } from '@vueuse/core'
 import BackBar from 'src/components/BackBar.vue'
 import GeoPicker from 'src/components/GeoPicker.vue'
-import type { IQuickMatchSheet } from 'src/types'
-import { defaultQuickMatchSheet } from 'src/types'
 import type { IGeo } from 'src/service/map/map.model'
+import { date } from 'quasar'
+import { useDefaultCoords } from 'src/composition/geo'
+import { quickMatch } from 'src/service/resource/resource.api'
 import { subAreasName } from '../HomePage/model'
 
 const showMapPicker = ref(false)
 
 const options = subAreasName
 
-const form = useLocalStorage<IQuickMatchSheet>('quickMatchForm', defaultQuickMatchSheet)
+const form = useLocalStorage('quickMatchForm', {
+  subArea: '',
+  start_date: date.formatDate(Date.now(), 'YYYY-MM-DD HH:mm'),
+  end_date: date.formatDate(Date.now(), 'YYYY-MM-DD HH:mm'),
+  ...useDefaultCoords('object'),
+  radius: 150,
+})
 
-function setQuickMatch() {
-  console.log('sq')
-}
+const startDate = ref(form.value.start_date.split(' ')[0])
+const startTime = ref(form.value.start_date.split(' ')[1])
+
+const endDate = ref(form.value.end_date.split(' ')[0])
+const endTime = ref(form.value.end_date.split(' ')[1])
+
+const addressName = useLocalStorage('quickMatchForm_addressName', '')
+
+watchEffect(() => {
+  form.value.start_date = `${startDate.value} ${startTime.value}`
+  form.value.end_date = `${endDate.value} ${endTime.value}`
+  console.log('form.start_date', form.value.start_date)
+  console.log('form.end_date', form.value.end_date)
+})
 
 function selectMap() {
   showMapPicker.value = true
@@ -23,8 +41,48 @@ function selectMap() {
 
 function onConfirmGeo(geo: IGeo) {
   console.log('geo', geo)
-  form.value.geo = geo
+  addressName.value = geo.address
+  form.value.longitude = geo.lnglat.longitude
+  form.value.latitude = geo.lnglat.latitude
   showMapPicker.value = false
+}
+
+function onSubmit() {
+  console.log('form.value', form.value)
+  quickMatch(form.value)
+    .subscribe((hrs) => {
+      console.log('hrs', hrs)
+      const start_date = date.extractDate(form.value.start_date, 'YYYY-MM-DD HH:mm')
+      const end_date = date.extractDate(form.value.end_date, 'YYYY-MM-DD HH:mm')
+      console.log('start_date', start_date)
+      console.log('end_date', end_date)
+      const res = hrs.filter((hr) => {
+        const hr_start_date = date.extractDate(hr.start_date, 'YYYY-MM-DD HH:mm')
+        const hr_end_date = date.extractDate(hr.end_date, 'YYYY-MM-DD HH:mm')
+        console.log('hr_start_date', hr_start_date)
+        console.log('hr_end_date', hr_end_date)
+        const isDateFit = date.isBetweenDates(
+          hr_start_date,
+          start_date,
+          end_date,
+        )
+          && date.isBetweenDates(
+            hr_end_date,
+            start_date,
+            end_date,
+          )
+        const isDistanceFit = AMap.GeometryUtil.distance(
+          [hr.longitude, hr.latitude],
+          [form.value.longitude, form.value.latitude],
+        ) < form.value.radius
+
+        return isDateFit && isDistanceFit
+      })
+      console.log('res', res)
+      // date.isBetweenDates(
+      //   form.value.start_date
+      // )
+    })
 }
 </script>
 
@@ -37,19 +95,19 @@ function onConfirmGeo(geo: IGeo) {
 
       <q-page-container>
         <q-page padding>
-          <q-form class="q-gutter-md" @submit="setQuickMatch">
+          <q-form class="q-gutter-md" @submit="onSubmit">
             <q-list padding>
               <q-item-label header>
                 设置
               </q-item-label>
-              <q-select v-model="form.subareaName" standout="bg-primary text-white" :options="options" label="服务分区"
+              <q-select v-model="form.subArea" standout="bg-primary text-white" :options="options" label="服务分区"
                 item-aligned />
 
-              <q-input v-model="form.date.from" filled item-aligned unmasked-value mask="####-##-## ##:##">
+              <q-input v-model="form.start_date" filled item-aligned unmasked-value mask="####-##-## ##:##">
                 <template #prepend>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.date.from" mask="YYYY-MM-DD HH:mm">
+                      <q-date v-model="startDate" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -61,7 +119,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #append>
                   <q-icon name="access_time" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-time v-model="form.date.from" mask="YYYY-MM-DD HH:mm" format24h>
+                      <q-time v-model="startTime" mask="HH:mm" format24h>
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -71,11 +129,11 @@ function onConfirmGeo(geo: IGeo) {
                 </template>
               </q-input>
 
-              <q-input v-model="form.date.to" filled item-aligned unmasked-value mask="####-##-## ##:##">
+              <q-input v-model="form.end_date" filled item-aligned unmasked-value mask="####-##-## ##:##">
                 <template #prepend>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.date.to" mask="YYYY-MM-DD HH:mm">
+                      <q-date v-model="endDate" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -87,7 +145,7 @@ function onConfirmGeo(geo: IGeo) {
                 <template #append>
                   <q-icon name="access_time" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-time v-model="form.date.to" mask="YYYY-MM-DD HH:mm" format24h>
+                      <q-time v-model="endTime" mask="HH:mm" format24h>
                         <div class="row items-center justify-end">
                           <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
@@ -97,7 +155,7 @@ function onConfirmGeo(geo: IGeo) {
                 </template>
               </q-input>
 
-              <q-input v-model="form.geo.address" filled item-aligned readonly placeholder="设置地理位置" @click="selectMap">
+              <q-input v-model="addressName" filled item-aligned readonly placeholder="设置地理位置" @click="selectMap">
                 <template #append>
                   <q-icon name="place" class="cursor-pointer" />
                 </template>
@@ -107,21 +165,23 @@ function onConfirmGeo(geo: IGeo) {
                 <q-layout view="Lhh lpR fff" container class="bg-white">
                   <q-header class="bg-primary">
                     <q-toolbar>
-                      <q-toolbar-title>地址选择</q-toolbar-title>
+                      <q-toolbar-title>地理位置</q-toolbar-title>
                       <q-btn v-close-popup flat round dense icon="close" />
                     </q-toolbar>
                   </q-header>
 
                   <q-page-container>
                     <q-page>
-                      <GeoPicker :source="form.geo.lnglat" @confirm="onConfirmGeo" />
+                      <GeoPicker :source="{ longitude: form.longitude, latitude: form.latitude }"
+                        @confirm="onConfirmGeo" />
                     </q-page>
                   </q-page-container>
                 </q-layout>
               </q-dialog>
 
-              <!-- <q-btn label="Submit" type="submit" color="primary" />
-              <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" /> -->
+              <q-input v-model.number="form.radius" type="number" filled item-aligned label="半径范围(米)" />
+
+              <q-btn label="开始匹配" type="submit" color="primary" w-full />
             </q-list>
           </q-form>
         </q-page>

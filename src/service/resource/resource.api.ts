@@ -1,5 +1,5 @@
 import { http } from '../http'
-import type { CreateHelpResourceParams, HelpResourceModel, HelpResourceStatus } from './resource.model'
+import type { CreateHelpResourceParams, HelpResourceModel, HelpResourceStatus, QuickMatchParams } from './resource.model'
 
 export enum HelpResourceApi {
   HR = 'help-resource',
@@ -28,6 +28,10 @@ export const getProvidedResources = (userId: number) => {
 
 export const fetchResourceListWithTag = (tag: string) => {
   return http.get<HelpResourceModel[]>(`${HelpResourceApi.Tag}/${encodeURIComponent(tag)}`)
+}
+
+export const quickMatch = (quickMatchParams: QuickMatchParams) => {
+  return http.post<HelpResourceModel[]>(`${HelpResourceApi.HR}/quick-match`, quickMatchParams)
 }
 
 // appoint provider
