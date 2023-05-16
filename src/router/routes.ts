@@ -101,6 +101,16 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/quick-match-detail',
+    component: () => import('src/layouts/ReturnableLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/QuickMatchDetail/QuickMatchDetail.vue'),
+      },
+    ],
+  },
+  {
     path: '/test',
     component: () => import('src/pages/TestTest.vue'),
   },

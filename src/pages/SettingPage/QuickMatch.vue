@@ -3,10 +3,12 @@ import { useLocalStorage } from '@vueuse/core'
 import BackBar from 'src/components/BackBar.vue'
 import GeoPicker from 'src/components/GeoPicker.vue'
 import type { IGeo } from 'src/service/map/map.model'
-import { date } from 'quasar'
+import { Notify, date } from 'quasar'
 import { useDefaultCoords } from 'src/composition/geo'
 import { useQuickMatchStore } from 'src/stores/quickMatch'
 import { subAreasName } from '../HomePage/model'
+
+const router = useRouter()
 
 const showMapPicker = ref(false)
 
@@ -50,6 +52,14 @@ function onConfirmGeo(geo: IGeo) {
 function onSubmit() {
   console.log('form.value', form.value)
   useQuickMatchStore().refresh()
+    .then(() => {
+      router.push('/quick-match-detail')
+    })
+    .catch((errMsg) => {
+      if (typeof errMsg === 'string')
+        Notify.create({ message: errMsg })
+      console.error(errMsg)
+    })
 }
 </script>
 

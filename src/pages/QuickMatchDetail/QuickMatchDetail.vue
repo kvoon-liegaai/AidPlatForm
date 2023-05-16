@@ -1,29 +1,26 @@
 <script setup lang='ts'>
 import { Notify, date, useMeta } from 'quasar'
-import { useRouteQuery } from '@vueuse/router'
-import { fetchResourceListWithTag } from 'src/service/resource/resource.api'
+import { useQuickMatchStore } from 'src/stores/quickMatch'
+import type { TagCardModel } from 'src/types'
 import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.model'
-import type { HelpResourceModel } from 'src/service/resource/resource.model'
-import { JsonViewer } from 'vue3-json-viewer'
+import type { WsRes } from 'src/common/ws'
+import { ReturnCode } from 'src/common/ws'
+import { useDefaultCoords } from 'src/composition/geo'
+import { notificationSocket } from 'src/service/websocket/notification'
 import { getIGeoByLnglat } from 'src/utils/map'
 import { useProfileStore } from 'src/stores/profile.store'
-import { useDefaultCoords } from 'src/composition/geo'
-import GeoViewer from 'components/GeoViewer.vue'
-import { ReturnCode } from 'src/common/ws'
-import type { WsRes } from 'src/common/ws'
-import { notificationSocket } from 'src/service/websocket/notification'
-import { useSubscription } from '@vueuse/rxjs'
-import type { TagCardModel } from 'src/types'
-
-const profileStore = useProfileStore()
-const tag = useRouteQuery('tag', '')
-const router = useRouter()
 
 useMeta({
-  title: tag.value,
+  title: '匹配结果',
 })
 
-const tagList = ref<TagCardModel[]>([])
+const router = useRouter()
+
+const quickMatchStore = useQuickMatchStore()
+const profileStore = useProfileStore()
+
+const tagList = ref<TagCardModel[]>(quickMatchStore.toTagList())
+
 const mapViewerState = reactive({
   isShowMapViewer: false,
   location: useDefaultCoords('object'),
@@ -99,22 +96,20 @@ function tryChat(userId: number) {
   router.push(`/chat/${userId}`)
 }
 
-function refresh(done?: any) {
-  useSubscription(
-    fetchResourceListWithTag(tag.value)
-      .subscribe((list: HelpResourceModel[]) => {
-        if (done)
-          done()
-        tagList.value = list.map((item): TagCardModel => {
-          return {
-            ...item,
-            expanded: false,
-            fullAddress: '',
-            address: '',
-          }
-        })
-      }),
-  )
+function refresh(done?: () => void) {
+  quickMatchStore.refresh()
+    .then(() => {
+      tagList.value = quickMatchStore.toTagList()
+    })
+    .catch((errMsg) => {
+      if (typeof errMsg === 'string')
+        Notify.create({ message: errMsg })
+      console.log(errMsg)
+    })
+    .finally(() => {
+      if (done)
+        done()
+    })
 }
 
 onMounted(() => {
@@ -123,6 +118,10 @@ onMounted(() => {
 </script>
 
 <template>
+  <div text-center color-coolGray-400>
+    为您找到了以下内容
+  </div>
+
   <q-pull-to-refresh color="primary" @refresh="refresh">
     <JsonViewer :value="tagList" copyable sort />
     <div class="flex flex-col mt-4">

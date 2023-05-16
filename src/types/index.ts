@@ -1,6 +1,7 @@
 import { date } from 'quasar'
 import { useDefaultCoords } from 'src/composition/geo'
-import type { CreateHelpResourceParams } from 'src/service/resource/resource.model'
+import type { ExAddress } from 'src/service/map/map.model'
+import type { CreateHelpResourceParams, HelpResourceModel } from 'src/service/resource/resource.model'
 
 const defaultProvideService: CreateHelpResourceParams = {
   name: '',
@@ -21,7 +22,15 @@ const defaultQuickMatchSheet = {
   ...useDefaultCoords('object'),
 }
 
+interface TagCardModel extends HelpResourceModel, ExAddress {
+  expanded: boolean
+}
+
 export {
   defaultQuickMatchSheet,
   defaultProvideService,
+}
+
+export type {
+  TagCardModel,
 }
