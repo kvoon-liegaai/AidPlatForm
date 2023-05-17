@@ -44,6 +44,14 @@ const mapNavState = reactive<MapNavState>({
   source: useDefaultCoords('object'),
 })
 
+function showMapNav(hr: HelpResourceModel) {
+  // isshow
+  mapNavState.isShowMapNav = true
+  // source
+  mapNavState.source.longitude = hr.longitude
+  mapNavState.source.latitude = hr.latitude
+}
+
 const evaluateCardState = reactive({
   isShow: false,
   evaluation: computed(() => { // 已存在评论
@@ -100,7 +108,9 @@ const evaluateCardState = reactive({
           <q-avatar size="30px">
             <img src="https://cdn.quasar.dev/img/boy-avatar.png">
           </q-avatar>
-          <q-btn icon="near_me" btn-gray label="去这里" flat />
+          <q-chip clickable bg-cool-gray-200 text-color="primary" icon="near_me" @click="showMapNav(hr)">
+            查看位置
+          </q-chip>
           <!-- <q-chip square color="primary" text-color="white" icon="event">
                                                                                                                                                                                                                                                                                                                                                                                     </q-chip> -->
         </div>

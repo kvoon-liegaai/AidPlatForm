@@ -9,6 +9,7 @@ import { useDefaultCoords } from 'src/composition/geo'
 import { notificationSocket } from 'src/service/websocket/notification'
 import { getIGeoByLnglat } from 'src/utils/map'
 import { useProfileStore } from 'src/stores/profile.store'
+import GeoViewer from 'src/components/GeoViewer.vue'
 
 useMeta({
   title: '匹配结果',

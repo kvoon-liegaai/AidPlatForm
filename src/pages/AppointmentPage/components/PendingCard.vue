@@ -4,12 +4,17 @@ import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.m
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import GeoNav from 'src/components/GeoNav.vue'
+import { Notify } from 'quasar'
 import type { MapNavState } from '../types'
 import { setHrStatus } from '../utils'
 
 const props = defineProps<{
   hr: HelpResourceModel
   isProvider: boolean
+}>()
+
+const emits = defineEmits<{
+  (event: 'refresh'): void
 }>()
 
 const router = useRouter()
@@ -31,10 +36,18 @@ function showMapNav(hr: HelpResourceModel, isStarter: boolean) {
 
 function onStart() {
   setHrStatus(props.hr, HelpResourceStatus.ONGOING)
+  Notify.create({ message: '开始成功' })
+  nextTick(() => {
+    emits('refresh')
+  })
 }
 
 function onCancel() {
   setHrStatus(props.hr, HelpResourceStatus.CANCELED)
+  Notify.create({ message: '取消成功' })
+  nextTick(() => {
+    emits('refresh')
+  })
 }
 </script>
 
@@ -70,7 +83,7 @@ function onCancel() {
         </div>
         <div flex justify-between>
           <q-chip clickable text-color="primary"
-            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : void 0">
+            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : router.push(`/chat/${hr.user.id}`)">
             <q-avatar>
               <img src=" https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>
@@ -101,7 +114,7 @@ function onCancel() {
 
       <q-page-container>
         <q-page>
-          <GeoNav :state="mapNavState" :starter="true" @on-start="onStart" />
+          <GeoNav :state="mapNavState" :starter="props.isProvider" @on-start="onStart" />
         </q-page>
       </q-page-container>
     </q-layout>

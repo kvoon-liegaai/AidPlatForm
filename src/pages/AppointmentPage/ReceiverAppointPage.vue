@@ -45,10 +45,10 @@ watch(curTab, (tab) => {
       <JsonViewer :value="hrList" copyable sort theme="light" />
       <section class="card-list-warpper" flex flex-col gap-4>
         <div v-for="(hr, key) in hrList" :key="key" class="card-list">
-          <PendingCard v-if="hr.status === HelpResourceStatus.PENDING" :hr="hr" :is-provider="false" />
-          <OngoingCard v-if="hr.status === HelpResourceStatus.ONGOING" :hr="hr" :is-provider="false" />
-          <FulfillCard v-if="hr.status === HelpResourceStatus.FULFILL" :hr="hr" :is-provider="false" />
-          <CancelCard v-if="hr.status === HelpResourceStatus.CANCELED" :hr="hr" :is-provider="false" />
+          <PendingCard v-if="hr.status === HelpResourceStatus.PENDING" :hr="hr" :is-provider="false" @refresh="refresh" />
+          <OngoingCard v-if="hr.status === HelpResourceStatus.ONGOING" :hr="hr" :is-provider="false" @refresh="refresh" />
+          <FulfillCard v-if="hr.status === HelpResourceStatus.FULFILL" :hr="hr" :is-provider="false" @refresh="refresh" />
+          <CancelCard v-if="hr.status === HelpResourceStatus.CANCELED" :hr="hr" :is-provider="false" @refresh="refresh" />
           <!-- <PendingCard v-else :hr="hr" /> -->
         </div>
       </section>

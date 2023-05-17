@@ -10,6 +10,7 @@ import { Dialog, Notify } from 'quasar'
 import { tap } from 'rxjs'
 import { getAllEvaluation, getAverageScore } from 'src/service/evaluation/evaluation.api'
 import type { EvaluationModel } from 'src/service/evaluation/evaluation.model'
+import { status2Name } from 'src/service/resource/resource.model'
 
 const profileStore = useProfileStore()
 
@@ -126,6 +127,14 @@ onMounted(() => {
         </div>
       </q-card-section>
       <q-card-section>
+        <section>
+          <span color-primary>
+            状态
+          </span>
+          <span>
+            <q-badge outline color="primary" :label="status2Name[checkHrDialogState.hr.status]" />
+          </span>
+        </section>
         <section>
           <span color-primary>
             分区
@@ -309,14 +318,14 @@ onMounted(() => {
               </div>
             </q-img>
             <q-card-actions>
-              <q-btn-group flat>
-                <q-btn dense flat>
+              <q-btn-group flat flex w-full>
+                <!-- <q-btn dense flat>
                   编辑
-                </q-btn>
-                <q-btn dense flat @click="() => { checkHrDialogState.visible = true; checkHrDialogState.hr = hr }">
+                </q-btn> -->
+                <q-btn grow-1 dense flat @click="() => { checkHrDialogState.visible = true; checkHrDialogState.hr = hr }">
                   查看
                 </q-btn>
-                <q-btn dense flat color="negative" @click="handleDeleteHR(hr.id)">
+                <q-btn grow-1 dense flat color="negative" @click="handleDeleteHR(hr.id)">
                   删除
                 </q-btn>
               </q-btn-group>

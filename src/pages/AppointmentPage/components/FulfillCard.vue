@@ -138,7 +138,7 @@ function onEvaluate() {
         <div flex gap-2>
           <!-- <q-btn icon="chat" btn-gray flat label="聊天" rounded /> -->
           <q-chip clickable text-color="primary"
-            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : void 0">
+            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : router.push(`/chat/${hr.user.id}`)">
             <q-avatar>
               <img src="https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>

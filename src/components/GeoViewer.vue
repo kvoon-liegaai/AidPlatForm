@@ -80,6 +80,10 @@ onMounted(() => {
     const targetMarker = new AMap.Marker({
       position: new AMap.LngLat(...center),
       title: cardInfo.value.address,
+      icon: new AMap.Icon({
+        image: 'src/assets/marker/self-location.svg',
+      }),
+      anchor: 'center',
     })
       .addTo(mapObj)
 

@@ -154,7 +154,7 @@ onUnmounted(() => {
       <span font-bold> {{ ` ${distance.toFixed(1)} ` }}</span>
       米
     </div>
-    <q-card v-if="props.starter" class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
+    <q-card class="my-card" fixed bottom-10 left-0 right-0 w-60 mx-auto>
       <q-card-section class="bg-grey-8 text-white">
         <div class="text-h6">
           {{ cardInfo.address }}
@@ -164,7 +164,7 @@ onUnmounted(() => {
           {{ cardInfo.fullAddress }}
         </div>
       </q-card-section>
-      <q-card-actions vertical align="center">
+      <q-card-actions v-if="props.starter" vertical align="center">
         <q-btn flat w-full :label="canStart ? '开始' : '未到达指定位置'" @click="start" />
       </q-card-actions>
     </q-card>

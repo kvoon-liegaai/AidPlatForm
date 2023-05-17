@@ -4,7 +4,7 @@ import { HelpResourceStatus, status2Name } from 'src/service/resource/resource.m
 // import { HelpResourceStatus } from 'src/service/resource/resource.model'
 import type { HelpResourceModel } from 'src/service/resource/resource.model'
 import GeoNav from 'src/components/GeoNav.vue'
-import { date } from 'quasar'
+import { Notify, date } from 'quasar'
 import { useTimestamp } from '@vueuse/core'
 import { callPolice } from 'src/utils/tel'
 import type { MapNavState } from '../types'
@@ -13,6 +13,10 @@ import { setHrStatus, timestamp2MS } from '../utils'
 const props = defineProps<{
   hr: HelpResourceModel
   isProvider: boolean
+}>()
+
+const emits = defineEmits<{
+  (event: 'refresh'): void
 }>()
 
 const router = useRouter()
@@ -58,10 +62,18 @@ function showMapNav(hr: HelpResourceModel) {
 function onFinish() {
   console.log('onfinish', props.hr)
   setHrStatus(props.hr, HelpResourceStatus.FULFILL)
+  Notify.create({ message: '操作成功' })
+  nextTick(() => {
+    emits('refresh')
+  })
 }
 
 function onCancel() {
   setHrStatus(props.hr, HelpResourceStatus.CANCELED)
+  Notify.create({ message: '取消成功' })
+  nextTick(() => {
+    emits('refresh')
+  })
 }
 </script>
 
@@ -109,7 +121,7 @@ function onCancel() {
           </q-avatar>
           <q-btn icon="chat" btn-gray label="联系一下" flat dense /> -->
           <q-chip clickable text-color="primary"
-            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : void 0">
+            @click="() => hr.receiver ? router.push(`/chat/${hr.receiver.id}`) : router.push(`/chat/${hr.user.id}`)">
             <q-avatar>
               <img src="https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>
